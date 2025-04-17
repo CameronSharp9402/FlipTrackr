@@ -26,7 +26,6 @@ namespace CSharpResaleBusinessTracker
         {
             SQLitePCL.Batteries_V2.Init();
             InitializeComponent();
-            DatabaseHelper.InitializeDatabase();
 
             // Initialize ObservableCollections
             Categories = new ObservableCollection<string>();
