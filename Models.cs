@@ -130,6 +130,8 @@ namespace CSharpResaleBusinessTracker
             }
         }
 
+        public string LifecycleStage => LifecycleStages[LifecycleIndex];
+
         public int LifecycleIndex
         {
             get => lifecycleIndex;
@@ -139,6 +141,7 @@ namespace CSharpResaleBusinessTracker
                 {
                     lifecycleIndex = value;
                     OnPropertyChanged(nameof(LifecycleIndex));
+                    OnPropertyChanged(nameof(LifecycleStages));
                 }
             }
         }

@@ -43,7 +43,7 @@ namespace CSharpResaleBusinessTracker
 
                 var createInventoryTableCmd = connection.CreateCommand();
                 createInventoryTableCmd.CommandText =
-                @"
+            @"
             CREATE TABLE IF NOT EXISTS Inventory (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ItemName TEXT,
@@ -62,7 +62,7 @@ namespace CSharpResaleBusinessTracker
 
                 var createExpensesTableCmd = connection.CreateCommand();
                 createExpensesTableCmd.CommandText =
-                @"
+            @"
             CREATE TABLE IF NOT EXISTS Expenses (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ItemName TEXT,
@@ -74,7 +74,7 @@ namespace CSharpResaleBusinessTracker
 
                 var createCategoriesTableCmd = connection.CreateCommand();
                 createCategoriesTableCmd.CommandText =
-                @"
+            @"
             CREATE TABLE IF NOT EXISTS Categories (
                 Name TEXT PRIMARY KEY
             );
