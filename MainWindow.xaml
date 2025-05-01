@@ -102,7 +102,9 @@
                             <Separator Margin="75 0 5 0"/>
                             <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30"/>
                             <Separator Margin="10 0 5 0"/>
-                            <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click"/>
+                            <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30"/>
+                            <Separator Margin="10 0 5 0"/>
+                            <Button Content="Batch Add Items" Width="125" Margin="5" Click="QuickAddButton_Click" Height="30"/>
                         </WrapPanel>
 
                         <!-- Inventory Filter -->
@@ -269,8 +271,24 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+            
+            <!-- Revenue Calculator -->
+            <TabItem Header="Revenue Calculator">
+                <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 5 0 10">
+                    <WrapPanel Margin="0 0 0 10">
+                        <TextBlock Text="Item Cost" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                        <TextBox x:Name="ItemCostTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
+                        <TextBlock Text="Selling Price" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                        <TextBox x:Name="SellingPriceTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
+                    </WrapPanel>
 
-            <!-- Reports Tab -->
+                    <TextBlock x:Name="CalcGrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
+                    <TextBlock x:Name="CalcRevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
+                    <TextBlock x:Name="CalcGrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
+                </StackPanel>
+            </TabItem>
+
+                <!-- Reports Tab -->
             <TabItem Header="Reports">
                 <StackPanel Margin="10">
                     <TextBlock Text="Coming Soon..." FontSize="16"/>

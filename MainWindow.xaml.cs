@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -129,7 +130,7 @@ namespace CSharpResaleBusinessTracker
             {
                 UpdateDashboard();
             }
-            
+
             var item = (Expenses)sender;
             DatabaseHelper.UpdateExpenseItem(item);
         }
@@ -226,11 +227,18 @@ namespace CSharpResaleBusinessTracker
             }
         }
 
+        private void QuickAddButton_Click(object sender, RoutedEventArgs e)
+        {
+            var quickAddWindow = new QuickAddWindow(inventory);
+            quickAddWindow.Owner = this;
+            quickAddWindow.ShowDialog();
+        }
+
         #endregion
 
         #region Dashboard Logic
 
-        private void UpdateDashboard()
+        public void UpdateDashboard()
         {
             double totalProfit = 0, totalRevenue = 0, totalCost = 0, totalROI = 0;
             int soldCount = 0, unsoldCount = 0;
@@ -642,6 +650,72 @@ namespace CSharpResaleBusinessTracker
 
             CategoryFilterComboBox.SelectedIndex = 0;
         }
+
+        #endregion
+
+        #region Revenue Calculator Logic
+        private void CalculatorField_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            if (textBox == null)
+                return;
+
+            string input = textBox.Text;
+
+            // Allow only digits and a single decimal point
+            int dotCount = input.Count(c => c == '.');
+
+            if (!double.TryParse(input, out _) || dotCount > 1)
+            {
+                // Keep only the first valid decimal point
+                bool decimalFound = false;
+                var corrected = new StringBuilder();
+                foreach (char c in input)
+                {
+                    if (char.IsDigit(c))
+                    {
+                        corrected.Append(c);
+                    }
+                    else if (c == '.' && !decimalFound)
+                    {
+                        corrected.Append(c);
+                        decimalFound = true;
+                    }
+                }
+
+                textBox.Text = corrected.ToString();
+                textBox.CaretIndex = textBox.Text.Length;
+            }
+
+            RevenueCalculator(); // Now safe to calculate
+        }
+
+        private void RevenueCalculator()
+        {
+            bool isCostValid = double.TryParse(ItemCostTextBox.Text, out double cost);
+            bool isSellingPriceValid = double.TryParse(SellingPriceTextBox.Text, out double sellingPrice);
+
+            if (isCostValid && isSellingPriceValid)
+            {
+                double calcTotalProfit = sellingPrice - cost;
+                double calcTotalRevenue = sellingPrice;
+
+                double calcGrossMargin = (calcTotalRevenue > 0) ? (calcTotalProfit / calcTotalRevenue) * 100 : 0;
+
+                SetTextBlock(CalcRevenueTextBlock, $"Revenue: {calcTotalProfit.ToString("C", CultureInfo.CurrentCulture)}");
+                SetTextBlock(CalcGrossRevenueTextBlock, $"Gross Revenue: {calcTotalRevenue.ToString("C", CultureInfo.CurrentCulture)}");
+                SetTextBlock(CalcGrossMarginTextBlock, $"Gross Margin: {calcGrossMargin:F2}%");
+            }
+            else
+            {
+                // If one or both fields are empty, show blanks but NO crash
+                SetTextBlock(CalcRevenueTextBlock, "Revenue: $0.00");
+                SetTextBlock(CalcGrossRevenueTextBlock, "Gross Revenue: $0.00");
+                SetTextBlock(CalcGrossMarginTextBlock, "Gross Margin: 0%");
+            }
+        }
+
+        #endregion
     }
-    #endregion
 }
