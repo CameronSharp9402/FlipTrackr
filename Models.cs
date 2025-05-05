@@ -22,6 +22,21 @@ namespace CSharpResaleBusinessTracker
         private string tags;
         private int marketplaceIndex;
         private int lifecycleIndex;
+        private string itemNotes;
+        private string attachmentPaths;
+
+        public string AttachmentPaths
+        {
+            get => attachmentPaths;
+            set
+            {
+                if (attachmentPaths != value)
+                {
+                    attachmentPaths = value;
+                    OnPropertyChanged(nameof(AttachmentPaths));
+                }
+            }
+        }
 
         public string Category
         {
@@ -160,6 +175,19 @@ namespace CSharpResaleBusinessTracker
         "Returned",
         "Pending"
         };
+
+        public string ItemNotes
+        {
+            get => itemNotes;
+            set
+            {
+                if (itemNotes != value)
+                {
+                    itemNotes = value;
+                    OnPropertyChanged(nameof(ItemNotes));
+                }
+            }
+        }
 
         public bool IsSold
         {

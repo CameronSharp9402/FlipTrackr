@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -227,13 +228,6 @@ namespace CSharpResaleBusinessTracker
             }
         }
 
-        private void QuickAddButton_Click(object sender, RoutedEventArgs e)
-        {
-            var quickAddWindow = new QuickAddWindow(inventory);
-            quickAddWindow.Owner = this;
-            quickAddWindow.ShowDialog();
-        }
-
         #endregion
 
         #region Dashboard Logic
@@ -371,6 +365,8 @@ namespace CSharpResaleBusinessTracker
                     DatePurchased = DateBox.SelectedDate.Value.ToString("MM/dd/yyyy"),
                     Tags = TagsBox.Text,
                     LifecycleIndex = lifecycleIndex,
+                    ItemNotes = "",
+                    AttachmentPaths = "",
                 };
 
                 inventory.Add(item);
@@ -649,6 +645,57 @@ namespace CSharpResaleBusinessTracker
             CategoryFilterComboBox.ItemsSource = filteredCategories;  // Bind ItemsSource
 
             CategoryFilterComboBox.SelectedIndex = 0;
+        }
+        private void QuickAddButton_Click(object sender, RoutedEventArgs e)
+        {
+            var quickAddWindow = new QuickAddWindow(inventory);
+            quickAddWindow.Owner = this;
+            quickAddWindow.ShowDialog();
+        }
+        private void AddFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Multiselect = true,
+                Filter = "Supported Files|*.jpg;*.jpeg;*.png;*.pdf;*.bmp;*.gif|All Files|*.*"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                if (InventoryTable.SelectedItem is InventoryItem selectedItem)
+                {
+                    string targetDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr", "Attachments", selectedItem.Id.ToString());
+                    Directory.CreateDirectory(targetDir);
+
+                    var existingPaths = selectedItem.AttachmentPaths?.Split(';')
+                        .Where(p => !string.IsNullOrWhiteSpace(p) && File.Exists(p))
+                        .ToList() ?? new List<string>();
+
+                    foreach (string file in openFileDialog.FileNames)
+                    {
+                        string fileName = Path.GetFileName(file);
+                        string destPath = Path.Combine(targetDir, fileName);
+                        File.Copy(file, destPath, true);
+                        existingPaths.Add(destPath);
+                    }
+
+                    // Ensure paths are unique and assigned
+                    selectedItem.AttachmentPaths = string.Join(";", existingPaths.Distinct());
+                    DatabaseHelper.UpdateInventoryItem(selectedItem);
+                    MessageBox.Show("Files added successfully!");
+                }
+            }
+        }
+        private void ViewFilesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as Button)?.DataContext is InventoryItem selectedItem)
+            {
+                var paths = selectedItem.AttachmentPaths?.Split(';').ToList() ?? new List<string>();
+
+                var viewer = new AttachmentViewerWindow(paths, selectedItem);
+                viewer.Owner = this;
+                viewer.ShowDialog();
+            }
         }
 
         #endregion

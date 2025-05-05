@@ -55,7 +55,9 @@ namespace CSharpResaleBusinessTracker
                 SKU TEXT,
                 IsSold INTEGER,
                 Tags TEXT,
-                Stage INTEGER
+                Stage INTEGER,
+                ItemNotes TEXT,
+                AttachmentPaths TEXT
             );
             ";
                 createInventoryTableCmd.ExecuteNonQuery();
@@ -175,8 +177,8 @@ namespace CSharpResaleBusinessTracker
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                INSERT INTO Inventory (ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage)
-                VALUES ($itemname, $category, $marketplaceIndex, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex);
+                INSERT INTO Inventory (ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths)
+                VALUES ($itemname, $category, $marketplaceIndex, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex, $itemNotes, $attachmentPaths);
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
                 command.Parameters.AddWithValue("$category", item.Category ?? "Unknown");
@@ -188,6 +190,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$isSold", item.IsSold ? 1 : 0);
                 command.Parameters.AddWithValue("$tags", item.Tags);
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
+                command.Parameters.AddWithValue("$itemNotes", item.ItemNotes ?? "");
+                command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths);
                 command.ExecuteNonQuery();
             }
         }
@@ -199,7 +203,7 @@ namespace CSharpResaleBusinessTracker
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage FROM Inventory;";
+                command.CommandText = "SELECT Id, ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths FROM Inventory;";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -217,6 +221,8 @@ namespace CSharpResaleBusinessTracker
                               IsSold = reader.GetInt32(8) == 1,
                               Tags = reader.GetString(9),
                               LifecycleIndex = reader.IsDBNull(10) ? 0 : reader.GetInt32(10),
+                              ItemNotes = reader.GetString(11),
+                              AttachmentPaths = reader.IsDBNull(12) ? null : reader.GetString(12),
                           });
                     }
                 }
@@ -313,7 +319,9 @@ namespace CSharpResaleBusinessTracker
                     SKU = $sku, 
                     IsSold = $isSold,
                     Tags = $tags,
-                    Stage = $lifecycleIndex
+                    Stage = $lifecycleIndex,
+                    ItemNotes = $itemNotes,
+                    AttachmentPaths = $attachmentPaths
                 WHERE Id = $id;
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
@@ -326,6 +334,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$isSold", item.IsSold ? 1 : 0);
                 command.Parameters.AddWithValue("$tags", item.Tags ?? string.Empty);
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
+                command.Parameters.AddWithValue("$itemNotes", item.ItemNotes);
+                command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths ?? string.Empty);
                 command.Parameters.AddWithValue("$id", item.Id);
                 command.ExecuteNonQuery();
             }

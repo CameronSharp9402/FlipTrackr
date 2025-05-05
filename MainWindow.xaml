@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
         mc:Ignorable="d"
         Title="FlipTrackr" 
-        Height="700" Width="1080"
+        Height="700" Width="1260"
         MinWidth="1080" MinHeight="700"
         MaxWidth="1920" MaxHeight="1080"
         ResizeMode="CanResize">
@@ -158,6 +158,17 @@
                     <!-- Inventory Table -->
                     <DataGrid x:Name="InventoryTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="InventoryTable_CellEditEnding" CanUserAddRows="False">
                         <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="Attachments">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="5">
+                                            <Button Content="View" Click="ViewFilesButton_Click" />
+                                            <Separator Margin="0 0 5 0"/>
+                                            <Button Content="Add" Click="AddFilesButton_Click" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
                             <DataGridTextColumn Header="Category" Binding="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
                             <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
@@ -199,6 +210,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Tags" Binding="{Binding Tags, UpdateSourceTrigger=PropertyChanged}" />
+                            <DataGridTextColumn Header="Notes" Binding="{Binding ItemNotes, UpdateSourceTrigger=PropertyChanged}"/>
                             <DataGridTemplateColumn Header="Actions">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
