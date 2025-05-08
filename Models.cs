@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace CSharpResaleBusinessTracker
 {
@@ -24,6 +26,35 @@ namespace CSharpResaleBusinessTracker
         private int lifecycleIndex;
         private string itemNotes;
         private string attachmentPaths;
+        private double shipping;
+        private double fees;
+        private Brush rowColor = Brushes.White;
+
+        public double Fees
+        {
+            get => fees;
+            set
+            {
+                if (fees != value)
+                {
+                    fees = value;
+                    OnPropertyChanged(nameof(Fees));
+                }
+            }
+        }
+
+        public double Shipping
+        {
+            get => shipping;
+            set
+            {
+                if (shipping != value)
+                {
+                    shipping = value;
+                    OnPropertyChanged(nameof(Shipping));
+                }
+            }
+        }
 
         public string AttachmentPaths
         {
@@ -201,6 +232,20 @@ namespace CSharpResaleBusinessTracker
                 }
             }
         }
+
+        public Brush RowColor
+        {
+            get => rowColor;
+            set
+            {
+                if (rowColor != value)
+                {
+                    rowColor = value;
+                    OnPropertyChanged(nameof(RowColor));
+                }
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>

@@ -7,114 +7,84 @@
         xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
         mc:Ignorable="d"
         Title="FlipTrackr" 
-        Height="700" Width="1260"
-        MinWidth="1080" MinHeight="700"
+        Height="750" Width="1260"
+        MinWidth="1260" MinHeight="750"
         MaxWidth="1920" MaxHeight="1080"
         ResizeMode="CanResize">
 
     <Grid>
-        <TabControl Margin="10">
+        <DockPanel>
+
+<!--#region Menu Bar -->
+            <Menu DockPanel.Dock="Top">
+                
+<!--#region File Tab -->
+                <MenuItem Header="File">
+                    
+                </MenuItem>
+<!--#endregion-->                
+
+<!--#region Settings Tab -->
+                <MenuItem Header="Settings">
+                    <MenuItem Header="ROI Threshold" Click="OpenSettings_Click"/>
+                </MenuItem>
+<!--#endregion-->
+            </Menu>           
+<!--#endregion-->
             
-            <!-- Dashboard Tab -->
-            <TabItem Header="Dashboard">
-                <StackPanel Orientation="Vertical" Margin="10">
-                    <Grid Margin="10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="FlipTrackr" FontSize="40" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <Button Content="Today" Click="DashboardFilterButton_Click" Tag="Today" Margin="5" Height="35" Width="55" FontSize="15"/>
-                            <Button Content="Yesterday" Click="DashboardFilterButton_Click" Tag="Yesterday" Margin="5" Height="35" Width="70" FontSize="15"/>
-                            <Button Content="Last Week" Click="DashboardFilterButton_Click" Tag="LastWeek" Margin="5" Height="35" Width="80" FontSize="15"/>
-                            <Button Content="Last Month" Click="DashboardFilterButton_Click" Tag="LastMonth" Margin="5" Height="35" Width="80" FontSize="15"/>
-                            <Button Content="Last 3 Months" Click="DashboardFilterButton_Click" Tag="Last3Months" Margin="5" Height="35" Width="100" FontSize="15"/>
-                            <Button Content="Last 6 Months" Click="DashboardFilterButton_Click" Tag="Last6Months" Margin="5" Height="35" Width="100" FontSize="15"/>
-                            <Button Content="All-Time" Click="DashboardFilterButton_Click" Tag="AllTime" Margin="5" Height="35" Width="65" FontSize="15"/>
+<!--#region Application Tabs-->
+            <Grid>
+                <TabControl Margin="10">
+<!--#region Dashboard Tab-->
+                    <TabItem Header="Dashboard">
+                        <StackPanel Orientation="Vertical" Margin="10">
+                            <Grid Margin="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="FlipTrackr" FontSize="40" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                    <Button Content="Today" Click="DashboardFilterButton_Click" Tag="Today" Margin="5" Height="35" Width="55" FontSize="15"/>
+                                    <Button Content="Yesterday" Click="DashboardFilterButton_Click" Tag="Yesterday" Margin="5" Height="35" Width="70" FontSize="15"/>
+                                    <Button Content="Last Week" Click="DashboardFilterButton_Click" Tag="LastWeek" Margin="5" Height="35" Width="80" FontSize="15"/>
+                                    <Button Content="Last Month" Click="DashboardFilterButton_Click" Tag="LastMonth" Margin="5" Height="35" Width="80" FontSize="15"/>
+                                    <Button Content="Last 3 Months" Click="DashboardFilterButton_Click" Tag="Last3Months" Margin="5" Height="35" Width="100" FontSize="15"/>
+                                    <Button Content="Last 6 Months" Click="DashboardFilterButton_Click" Tag="Last6Months" Margin="5" Height="35" Width="100" FontSize="15"/>
+                                    <Button Content="All-Time" Click="DashboardFilterButton_Click" Tag="AllTime" Margin="5" Height="35" Width="65" FontSize="15"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Dashboard Metrics  -->
+                            <TextBlock x:Name="StageSummaryTextBlock" Text="Loading stage summary..." FontWeight="Bold" FontSize="14" Margin="10" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="TotalCostOfGoodsTextBlock" FontSize="16" Text="Total Cost Of Goods: $0.00" Margin="0 10"/>
+                            <TextBlock x:Name="GrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
+                            <TextBlock x:Name="RevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
+                            <TextBlock x:Name="GrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
+                            <TextBlock x:Name="ReturnOnInventmentTextBlock" FontSize="16" Text="Return On Investment (ROI): 0%" Margin="0 10"/>
+                            <TextBlock x:Name="AverageSalePriceTextBlock" FontSize="16" Text="Average Sale Price: $0" Margin="0 10"/>
+                            <TextBlock x:Name="InventoryTurnoverRateTextBlock" FontSize="16" Text="Turnover Rate = 0 items" Margin="0 10"/>
+                            <TextBlock x:Name="ExpensesTextBlock" FontSize="16" Text="Expenses: $0" Margin="0 10"/>
+                            <TextBlock x:Name="ShippingTextBlock" FontSize="16" Text="Shipping: $0" Margin="0 10"/>
+                            <TextBlock x:Name="FeesTextBlock" FontSize="16" Text="Fees: $0" Margin="0 10"/>
                         </StackPanel>
-                    </Grid>
+                    </TabItem>
+<!--#endregion-->
+                    
+<!--#region Inventory Tab -->
+                    <TabItem Header="Inventory">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                    <!-- Dashboard Metrics  -->
-                    <TextBlock x:Name="StageSummaryTextBlock" Text="Loading stage summary..." FontWeight="Bold" FontSize="14" Margin="10" TextWrapping="Wrap"/>
-                    <TextBlock x:Name="TotalCostOfGoodsTextBlock" FontSize="16" Text="Total Cost Of Goods: $0.00" Margin="0 10"/>
-                    <TextBlock x:Name="GrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
-                    <TextBlock x:Name="RevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
-                    <TextBlock x:Name="GrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
-                    <TextBlock x:Name="ReturnOnInventmentTextBlock" FontSize="16" Text="Return On Investment (ROI): 0%" Margin="0 10"/>
-                    <TextBlock x:Name="AverageSalePriceTextBlock" FontSize="16" Text="Average Sale Price: $0" Margin="0 10"/>
-                    <TextBlock x:Name="InventoryTurnoverRateTextBlock" FontSize="16" Text="Turnover Rate = 0 items" Margin="0 10"/>
-                    <TextBlock x:Name="ExpensesTextBlock" FontSize="16" Text="Expenses: $0" Margin="0 10"/>
-                </StackPanel>
-            </TabItem>
-
-            <!-- Inventory Tab -->
-            <TabItem Header="Inventory">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Input Form -->
-                    <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
-                        <WrapPanel Margin="0 0 0 10">
-                            <ComboBox x:Name="CategoryComboBox" Width="125" Margin="5" SelectedIndex="0" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" SelectionChanged="CategoryComboBox_SelectionChanged"/>
-                            <ComboBox x:Name="MarketplaceInputComboBox" Width="150" Margin="5,0,10,0" Height="22" ItemsSource="{Binding MarketplaceIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
-                                <ComboBoxItem Content="Select Marketplace"/>
-                                <ComboBoxItem Content="Amazon"/>
-                                <ComboBoxItem Content="Ebay"/>
-                                <ComboBoxItem Content="Mercari"/>
-                                <ComboBoxItem Content="Facebook Marketplace"/>
-                                <ComboBoxItem Content="OfferUp"/>
-                                <ComboBoxItem Content="Craigslist"/>
-                                <ComboBoxItem Content="Etsy"/>
-                                <ComboBoxItem Content="Poshmark"/>
-                                <ComboBoxItem Content="Depop"/>
-                                <ComboBoxItem Content="Whatnot"/>
-                                <ComboBoxItem Content="Other"/>
-                            </ComboBox>
-                            <TextBlock Text="Item Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <TextBox x:Name="ItemNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
-                            <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <TextBox x:Name="PurchasePriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
-                            <TextBlock Text="Selling Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <TextBox x:Name="SellingPriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
-                        </WrapPanel>
-
-                        <WrapPanel>
-                            <TextBlock Text="SKU:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <TextBox x:Name="SkuBox" Width="120" Margin="0 0 15 0" Height="20"/>
-                            <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <DatePicker x:Name="DateBox" Width="150" Margin="0 0 15 0" Height="25"/>
-                            <TextBlock Text="Tags:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                            <TextBox x:Name="TagsBox" Width="150" Margin="0 0 15 0" Height="20"/>
-                            <ComboBox x:Name="LifecycleComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
-                                <ComboBoxItem Content="Select Stage"/>
-                                <ComboBoxItem Content="Sourced"/>
-                                <ComboBoxItem Content="Listed"/>
-                                <ComboBoxItem Content="Sold"/>
-                                <ComboBoxItem Content="Returned"/>
-                                <ComboBoxItem Content="Other"/>
-                            </ComboBox>
-                            <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0"/>
-                            <Separator Margin="75 0 5 0"/>
-                            <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30"/>
-                            <Separator Margin="10 0 5 0"/>
-                            <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30"/>
-                            <Separator Margin="10 0 5 0"/>
-                            <Button Content="Batch Add Items" Width="125" Margin="5" Click="QuickAddButton_Click" Height="30"/>
-                        </WrapPanel>
-
-                        <!-- Inventory Filter -->
-                        <Popup x:Name="FilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=InventoryFilterButton}">
-                            <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
-                                <StackPanel>
-                                    <TextBlock Text="Filter by:" FontWeight="Bold"/>
-                                    <ComboBox x:Name="CategoryFilterComboBox" Width="200" ItemsSource="{Binding Categories}" SelectedIndex="0"/>
-                                    <Separator Margin="0 0 0 5"/>
-                                    <ComboBox x:Name="MarketplaceCategoryFilterComboBox" Width="200">
+                            <!-- Input Form -->
+                            <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
+                                <WrapPanel Margin="0 0 0 10">
+                                    <ComboBox x:Name="CategoryComboBox" Width="125" Margin="5" SelectedIndex="0" ItemsSource="{Binding Categories}" SelectedItem="{Binding SelectedCategory, Mode=TwoWay}" SelectionChanged="CategoryComboBox_SelectionChanged"/>
+                                    <ComboBox x:Name="MarketplaceInputComboBox" Width="150" Margin="5,0,10,0" Height="22" ItemsSource="{Binding MarketplaceIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Select Marketplace"/>
                                         <ComboBoxItem Content="Amazon"/>
                                         <ComboBoxItem Content="Ebay"/>
@@ -128,184 +98,281 @@
                                         <ComboBoxItem Content="Whatnot"/>
                                         <ComboBoxItem Content="Other"/>
                                     </ComboBox>
-                                    <Separator Margin="0 0 0 5"/>
-                                    <ComboBox x:Name="LifecycleFilterComboBox" Width="200">
+                                    <TextBlock Text="Item Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="ItemNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
+                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="PurchasePriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
+                                    <TextBlock Text="Selling Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="SellingPriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
+                                </WrapPanel>
+
+                                <WrapPanel>
+                                    <TextBlock Text="SKU:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="SkuBox" Width="120" Margin="0 0 15 0" Height="20"/>
+                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <DatePicker x:Name="DateBox" Width="150" Margin="0 0 15 0" Height="25"/>
+                                    <TextBlock Text="Tags:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="TagsBox" Width="150" Margin="0 0 15 0" Height="20"/>
+                                    <ComboBox x:Name="LifecycleComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Select Stage"/>
                                         <ComboBoxItem Content="Sourced"/>
                                         <ComboBoxItem Content="Listed"/>
                                         <ComboBoxItem Content="Sold"/>
                                         <ComboBoxItem Content="Returned"/>
-                                        <ComboBoxItem Content="Pending"/>
+                                        <ComboBoxItem Content="Other"/>
                                     </ComboBox>
-                                    <Separator Margin="0 0 0 5"/>
-                                    <TextBlock Text="Item Name:"/>
-                                    <TextBox x:Name="ItemNameFilterTextBox" Width="200" Margin="0 5"/>
-                                    <TextBlock Text="Min Purchase Price:"/>
-                                    <TextBox x:Name="MinPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                    <TextBlock Text="Max Purchase Price:"/>
-                                    <TextBox x:Name="MaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                    <TextBlock Text="Tags"/>
-                                    <TextBox x:Name="TagsFilterTextBox" Width="200" Margin="0 5"/>
-                                    <Separator Margin="0 0 0 5"/>
-                                    <Button Content="Apply Filters" Width="100" Height="30" Click="ApplyFilterButton_Click"/>
-                                    <Button Content="Reset Filters" Width="100" Margin="5" Click="ResetFiltersButton_Click"/>
-                                    <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
-                                </StackPanel>
-                            </Border>
-                        </Popup>
-                    </StackPanel>
+                                    <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0"/>
+                                    <Separator Margin="75 0 5 0"/>
+                                    <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30"/>
+                                    <Separator Margin="10 0 5 0"/>
+                                    <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30"/>
+                                    <Separator Margin="10 0 5 0"/>
+                                    <Button Content="Batch Add Items" Width="125" Margin="5" Click="QuickAddButton_Click" Height="30"/>
+                                </WrapPanel>
 
-                    <!-- Inventory Table -->
-                    <DataGrid x:Name="InventoryTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="InventoryTable_CellEditEnding" CanUserAddRows="False">
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Attachments">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" Margin="5">
-                                            <Button Content="View" Click="ViewFilesButton_Click" />
-                                            <Separator Margin="0 0 5 0"/>
-                                            <Button Content="Add" Click="AddFilesButton_Click" />
+                                <!-- Inventory Filter -->
+                                <Popup x:Name="FilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=InventoryFilterButton}">
+                                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
+                                        <StackPanel>
+                                            <TextBlock Text="Filter by:" FontWeight="Bold"/>
+                                            <ComboBox x:Name="CategoryFilterComboBox" Width="200" ItemsSource="{Binding Categories}" SelectedIndex="0"/>
+                                            <Separator Margin="0 0 0 5"/>
+                                            <ComboBox x:Name="MarketplaceCategoryFilterComboBox" Width="200">
+                                                <ComboBoxItem Content="Select Marketplace"/>
+                                                <ComboBoxItem Content="Amazon"/>
+                                                <ComboBoxItem Content="Ebay"/>
+                                                <ComboBoxItem Content="Mercari"/>
+                                                <ComboBoxItem Content="Facebook Marketplace"/>
+                                                <ComboBoxItem Content="OfferUp"/>
+                                                <ComboBoxItem Content="Craigslist"/>
+                                                <ComboBoxItem Content="Etsy"/>
+                                                <ComboBoxItem Content="Poshmark"/>
+                                                <ComboBoxItem Content="Depop"/>
+                                                <ComboBoxItem Content="Whatnot"/>
+                                                <ComboBoxItem Content="Other"/>
+                                            </ComboBox>
+                                            <Separator Margin="0 0 0 5"/>
+                                            <ComboBox x:Name="LifecycleFilterComboBox" Width="200">
+                                                <ComboBoxItem Content="Select Stage"/>
+                                                <ComboBoxItem Content="Sourced"/>
+                                                <ComboBoxItem Content="Listed"/>
+                                                <ComboBoxItem Content="Sold"/>
+                                                <ComboBoxItem Content="Returned"/>
+                                                <ComboBoxItem Content="Pending"/>
+                                            </ComboBox>
+                                            <Separator Margin="0 0 0 5"/>
+                                            <TextBlock Text="Item Name:"/>
+                                            <TextBox x:Name="ItemNameFilterTextBox" Width="200" Margin="0 5"/>
+                                            <TextBlock Text="Min Purchase Price:"/>
+                                            <TextBox x:Name="MinPurchasePriceTextBox" Width="200" Margin="0 5"/>
+                                            <TextBlock Text="Max Purchase Price:"/>
+                                            <TextBox x:Name="MaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
+                                            <TextBlock Text="Tags"/>
+                                            <TextBox x:Name="TagsFilterTextBox" Width="200" Margin="0 5"/>
+                                            <Separator Margin="0 0 0 5"/>
+                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ApplyFilterButton_Click"/>
+                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ResetFiltersButton_Click"/>
+                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
                                         </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Category" Binding="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Selling Price" Binding="{Binding SellingPrice, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Date Purchased" Binding="{Binding DatePurchased, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="SKU" Binding="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTemplateColumn Header="Marketplace">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ComboBox x:Name="MarketplaceTableComboBox" Width="200" SelectedIndex="{Binding MarketplaceIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                            <ComboBoxItem Content="Select Marketplace"/>
-                                            <ComboBoxItem Content="Amazon"/>
-                                            <ComboBoxItem Content="Ebay"/>
-                                            <ComboBoxItem Content="Mercari"/>
-                                            <ComboBoxItem Content="Facebook Marketplace"/>
-                                            <ComboBoxItem Content="OfferUp"/>
-                                            <ComboBoxItem Content="Craigslist"/>
-                                            <ComboBoxItem Content="Etsy"/>
-                                            <ComboBoxItem Content="Poshmark"/>
-                                            <ComboBoxItem Content="Depop"/>
-                                            <ComboBoxItem Content="Whatnot"/>
-                                            <ComboBoxItem Content="Other"/>
-                                        </ComboBox>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Stage">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ComboBox x:Name="LifecycleTableComboBox" Width="200" SelectedIndex="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="LifecycleTableComboBox_SelectionChanged">
-                                            <ComboBoxItem Content="Select Stage" IsEnabled="False"/>
-                                            <ComboBoxItem Content="Sourced"/>
-                                            <ComboBoxItem Content="Listed"/>
-                                            <ComboBoxItem Content="Sold"/>
-                                            <ComboBoxItem Content="Returned"/>
-                                            <ComboBoxItem Content="Pending"/>
-                                        </ComboBox>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTextColumn Header="Tags" Binding="{Binding Tags, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Notes" Binding="{Binding ItemNotes, UpdateSourceTrigger=PropertyChanged}"/>
-                            <DataGridTemplateColumn Header="Actions">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
+                                    </Border>
+                                </Popup>
+                            </StackPanel>
 
-            <!-- Expenses Tab -->
-            <TabItem Header="Expenses">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                            <!-- Inventory Table -->
+                            <DataGrid x:Name="InventoryTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="InventoryTable_CellEditEnding" CanUserAddRows="False">
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="{Binding RowColor}" />
+                                    </Style>
+                                </DataGrid.RowStyle>
+
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Attachments">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="5">
+                                                    <Button Content="View" Click="ViewFilesButton_Click" />
+                                                    <Separator Margin="0 0 5 0"/>
+                                                    <Button Content="Add" Click="AddFilesButton_Click" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Category" Binding="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}">
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Selling Price" Binding="{Binding SellingPrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}" >
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Date Purchased" Binding="{Binding DatePurchased, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="SKU" Binding="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTemplateColumn Header="Marketplace">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox x:Name="MarketplaceTableComboBox" Width="200" SelectedIndex="{Binding MarketplaceIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                                                    <ComboBoxItem Content="Select Marketplace"/>
+                                                    <ComboBoxItem Content="Amazon"/>
+                                                    <ComboBoxItem Content="Ebay"/>
+                                                    <ComboBoxItem Content="Mercari"/>
+                                                    <ComboBoxItem Content="Facebook Marketplace"/>
+                                                    <ComboBoxItem Content="OfferUp"/>
+                                                    <ComboBoxItem Content="Craigslist"/>
+                                                    <ComboBoxItem Content="Etsy"/>
+                                                    <ComboBoxItem Content="Poshmark"/>
+                                                    <ComboBoxItem Content="Depop"/>
+                                                    <ComboBoxItem Content="Whatnot"/>
+                                                    <ComboBoxItem Content="Other"/>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Stage">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox x:Name="LifecycleTableComboBox" Width="200" SelectedIndex="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="LifecycleTableComboBox_SelectionChanged">
+                                                    <ComboBoxItem Content="Select Stage" IsEnabled="False"/>
+                                                    <ComboBoxItem Content="Sourced"/>
+                                                    <ComboBoxItem Content="Listed"/>
+                                                    <ComboBoxItem Content="Sold"/>
+                                                    <ComboBoxItem Content="Returned"/>
+                                                    <ComboBoxItem Content="Pending"/>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}" >
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Fees" Binding="{Binding Fees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}" >
+                                        <DataGridTextColumn.EditingElementStyle>
+                                            <Style TargetType="TextBox">
+                                                <Setter Property="HorizontalContentAlignment" Value="Right" />
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                            </Style>
+                                        </DataGridTextColumn.EditingElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Tags" Binding="{Binding Tags, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Notes" Binding="{Binding ItemNotes, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <DataGridTemplateColumn Header="Actions">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+<!--#endregion-->
                     
-                    <!-- Expenses Input Form -->
-                    <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
+<!--#region Expenses Tab -->
+                    <TabItem Header="Expenses">
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Expenses Input Form -->
+                            <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
+                                <WrapPanel Margin="0 0 0 10">
+                                    <TextBlock Text="Expense Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="ExpenseItemNameBox" Width="150" Margin="0 0 15 0"/>
+                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="ExpensePurchasePriceBox" Width="100" Margin="0 0 15 0"/>
+                                </WrapPanel>
+
+                                <WrapPanel>
+                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <DatePicker x:Name="ExpenseDateBox" Width="150" Margin="0 0 15 0"/>
+                                    <Button Content="Add Expense" Click="AddExpenseButton_Click" Width="100" Margin="0 0 0 0"/>
+                                    <Button x:Name="ExpensesFilterButton" Content="Filter" Width="100" Click="ExpensesFilterButton_Click" Margin="550 0 0 0"/>
+                                </WrapPanel>
+
+                                <!-- Expenses Filter -->
+                                <Popup x:Name="ExpensesFilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=ExpensesFilterButton}">
+                                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
+                                        <StackPanel>
+                                            <TextBlock Text="Filter by:" FontWeight="Bold"/>
+                                            <TextBlock Text="Item Name:"/>
+                                            <TextBox x:Name="ExpenseItemNameFilterTextBox" Width="200" Margin="0 5"/>
+                                            <TextBlock Text="Min Purchase Price:"/>
+                                            <TextBox x:Name="ExpenseMinPurchasePriceTextBox" Width="200" Margin="0 5"/>
+                                            <TextBlock Text="Max Purchase Price:"/>
+                                            <TextBox x:Name="ExpenseMaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
+                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ExpensesApplyFilterButton_Click"/>
+                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ExpensesResetFiltersButton_Click"/>
+                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
+                                        </StackPanel>
+                                    </Border>
+                                </Popup>
+                            </StackPanel>
+
+                            <!-- Expense Table -->
+                            <DataGrid x:Name="ExpenseTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="ExpenseTable_CellEditEnding" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Expense Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Date Purchased" Binding="{Binding DatePurchased, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTemplateColumn Header="Actions">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="Delete" Click="DeleteExpenseButton_Click" Tag="{Binding ItemName}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </TabItem>
+<!--#endregion-->
+                    
+<!--#region Revenue Calculator -->
+                    <!-- Revenue Calculator -->
+                    <TabItem Header="Revenue Calculator">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 5 0 10">
                             <WrapPanel Margin="0 0 0 10">
-                                <TextBlock Text="Expense Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                                <TextBox x:Name="ExpenseItemNameBox" Width="150" Margin="0 0 15 0"/>
-                                <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                                <TextBox x:Name="ExpensePurchasePriceBox" Width="100" Margin="0 0 15 0"/>
+                                <TextBlock Text="Item Cost" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                <TextBox x:Name="ItemCostTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
+                                <TextBlock Text="Selling Price" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                <TextBox x:Name="SellingPriceTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
                             </WrapPanel>
 
-                            <WrapPanel>
-                                <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                                <DatePicker x:Name="ExpenseDateBox" Width="150" Margin="0 0 15 0"/>
-                                <Button Content="Add Expense" Click="AddExpenseButton_Click" Width="100" Margin="0 0 0 0"/>
-                                <Button x:Name="ExpensesFilterButton" Content="Filter" Width="100" Click="ExpensesFilterButton_Click" Margin="550 0 0 0"/>
-                            </WrapPanel>
-
-                        <!-- Expenses Filter -->
-                            <Popup x:Name="ExpensesFilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=ExpensesFilterButton}">
-                                <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
-                                    <StackPanel>
-                                        <TextBlock Text="Filter by:" FontWeight="Bold"/>
-                                        <TextBlock Text="Item Name:"/>
-                                        <TextBox x:Name="ExpenseItemNameFilterTextBox" Width="200" Margin="0 5"/>
-                                        <TextBlock Text="Min Purchase Price:"/>
-                                        <TextBox x:Name="ExpenseMinPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                        <TextBlock Text="Max Purchase Price:"/>
-                                        <TextBox x:Name="ExpenseMaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                        <Button Content="Apply Filters" Width="100" Height="30" Click="ExpensesApplyFilterButton_Click"/>
-                                        <Button Content="Reset Filters" Width="100" Margin="5" Click="ExpensesResetFiltersButton_Click"/>
-                                        <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
-                                    </StackPanel>
-                                </Border>
-                            </Popup>
+                            <TextBlock x:Name="CalcGrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
+                            <TextBlock x:Name="CalcRevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
+                            <TextBlock x:Name="CalcGrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
                         </StackPanel>
-
-                        <!-- Expense Table -->
-                    <DataGrid x:Name="ExpenseTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="ExpenseTable_CellEditEnding" CanUserAddRows="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Expense Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTextColumn Header="Date Purchased" Binding="{Binding DatePurchased, UpdateSourceTrigger=PropertyChanged}" />
-                            <DataGridTemplateColumn Header="Actions">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Delete" Click="DeleteExpenseButton_Click" Tag="{Binding ItemName}" />
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-            
-            <!-- Revenue Calculator -->
-            <TabItem Header="Revenue Calculator">
-                <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 5 0 10">
-                    <WrapPanel Margin="0 0 0 10">
-                        <TextBlock Text="Item Cost" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                        <TextBox x:Name="ItemCostTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
-                        <TextBlock Text="Selling Price" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                        <TextBox x:Name="SellingPriceTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
-                    </WrapPanel>
-
-                    <TextBlock x:Name="CalcGrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
-                    <TextBlock x:Name="CalcRevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
-                    <TextBlock x:Name="CalcGrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
-                </StackPanel>
-            </TabItem>
-
-                <!-- Reports Tab -->
-            <TabItem Header="Reports">
-                <StackPanel Margin="10">
-                    <TextBlock Text="Coming Soon..." FontSize="16"/>
-                </StackPanel>
-            </TabItem>
-        </TabControl>
+                    </TabItem>
+<!--#endregion-->
+                    
+<!--#region Reports Tab -->                    
+                    <TabItem Header="Reports">
+                        <StackPanel Margin="10">
+                            <TextBlock Text="Coming Soon..." FontSize="16"/>
+                        </StackPanel>
+                    </TabItem>
+<!--#endregion-->
+                </TabControl>
+            </Grid>
+<!--#endregion-->
+        </DockPanel>
     </Grid>
 </Window>

@@ -57,7 +57,9 @@ namespace CSharpResaleBusinessTracker
                 Tags TEXT,
                 Stage INTEGER,
                 ItemNotes TEXT,
-                AttachmentPaths TEXT
+                AttachmentPaths TEXT,
+                Shipping INTEGER,
+                Fees INTEGER
             );
             ";
                 createInventoryTableCmd.ExecuteNonQuery();
@@ -177,8 +179,8 @@ namespace CSharpResaleBusinessTracker
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                INSERT INTO Inventory (ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths)
-                VALUES ($itemname, $category, $marketplaceIndex, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex, $itemNotes, $attachmentPaths);
+                INSERT INTO Inventory (ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths, Shipping, Fees)
+                VALUES ($itemname, $category, $marketplaceIndex, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex, $itemNotes, $attachmentPaths, $shipping, $fees);
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
                 command.Parameters.AddWithValue("$category", item.Category ?? "Unknown");
@@ -192,6 +194,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
                 command.Parameters.AddWithValue("$itemNotes", item.ItemNotes ?? "");
                 command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths);
+                command.Parameters.AddWithValue("$shipping", item.Shipping);
+                command.Parameters.AddWithValue("$fees", item.Fees);
                 command.ExecuteNonQuery();
             }
         }
@@ -203,7 +207,7 @@ namespace CSharpResaleBusinessTracker
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths FROM Inventory;";
+                command.CommandText = "SELECT Id, ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths, Shipping, Fees FROM Inventory;";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -223,6 +227,8 @@ namespace CSharpResaleBusinessTracker
                               LifecycleIndex = reader.IsDBNull(10) ? 0 : reader.GetInt32(10),
                               ItemNotes = reader.GetString(11),
                               AttachmentPaths = reader.IsDBNull(12) ? null : reader.GetString(12),
+                              Shipping = reader.GetDouble(13),
+                              Fees = reader.GetDouble(14),
                           });
                     }
                 }
@@ -321,7 +327,9 @@ namespace CSharpResaleBusinessTracker
                     Tags = $tags,
                     Stage = $lifecycleIndex,
                     ItemNotes = $itemNotes,
-                    AttachmentPaths = $attachmentPaths
+                    AttachmentPaths = $attachmentPaths,
+                    Shipping = $shipping,
+                    Fees = $fees
                 WHERE Id = $id;
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
@@ -336,6 +344,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
                 command.Parameters.AddWithValue("$itemNotes", item.ItemNotes);
                 command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths ?? string.Empty);
+                command.Parameters.AddWithValue("$shipping", item.Shipping);
+                command.Parameters.AddWithValue("$fees", item.Fees);
                 command.Parameters.AddWithValue("$id", item.Id);
                 command.ExecuteNonQuery();
             }

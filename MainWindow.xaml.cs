@@ -11,12 +11,16 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
+using System.Windows.Media;
 
 
 namespace CSharpResaleBusinessTracker
 {
     public partial class MainWindow : Window
     {
+        #region Initialization
+
         private ObservableCollection<InventoryItem> inventory;
         private ObservableCollection<Expenses> expense;
         public ObservableCollection<string> Categories { get; set; }
@@ -24,10 +28,27 @@ namespace CSharpResaleBusinessTracker
 
         private DateTime? startDateFilter = null;
         private DateTime? endDateFilter = null;
+
+        public static MainWindow Current => Application.Current.MainWindow as MainWindow;
+
+        public double RoiThreshold { get; set; }
+        public double YellowLeeway { get; set; } = 5;   // ±5% around threshold
+
         public MainWindow()
         {
             SQLitePCL.Batteries_V2.Init();
             InitializeComponent();
+
+            var settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr", "settings.txt");
+            if (File.Exists(settingsPath) &&
+                double.TryParse(File.ReadAllText(settingsPath), NumberStyles.Float, CultureInfo.InvariantCulture, out double savedThreshold))
+            {
+                RoiThreshold = savedThreshold;
+            }
+            else
+            {
+                RoiThreshold = 20; // Default fallback
+            }
 
             // Initialize ObservableCollections
             Categories = new ObservableCollection<string>();
@@ -75,6 +96,7 @@ namespace CSharpResaleBusinessTracker
 
             UpdateDashboard();
         }
+        #endregion
 
         #region Event Handlers
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -144,7 +166,6 @@ namespace CSharpResaleBusinessTracker
 
             UpdateDashboard();
         }
-
 
         private void ExpenseTable_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
@@ -227,14 +248,26 @@ namespace CSharpResaleBusinessTracker
                 UpdateDashboard(); // <-- Trigger immediate UI update
             }
         }
+        public void UpdateRoiThreshold(double newThreshold)
+        {
+            RoiThreshold = newThreshold;
+
+            // Save it to file
+            var settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr", "settings.txt");
+            Directory.CreateDirectory(Path.GetDirectoryName(settingsPath));
+            File.WriteAllText(settingsPath, newThreshold.ToString(CultureInfo.InvariantCulture));
+
+            // Immediately update
+            UpdateDashboard();
+        }
 
         #endregion
 
         #region Dashboard Logic
-
         public void UpdateDashboard()
         {
             double totalProfit = 0, totalRevenue = 0, totalCost = 0, totalROI = 0;
+            double totalShipping = 0, totalFees = 0;
             int soldCount = 0, unsoldCount = 0;
 
             foreach (var item in inventory)
@@ -260,10 +293,16 @@ namespace CSharpResaleBusinessTracker
                             break;
 
                         case 3: // Sold
-                            double profit = item.SellingPrice - item.PurchasePrice;
+                            double totalItemCost = item.PurchasePrice + item.Shipping + item.Fees;
+                            double profit = item.SellingPrice - totalItemCost;
+
+                            totalCost += item.PurchasePrice; // base cost
+                            totalShipping += item.Shipping;
+                            totalFees += item.Fees;
+
                             totalProfit += profit;
                             totalRevenue += item.SellingPrice;
-                            totalROI += (profit / item.PurchasePrice) * 100;
+                            totalROI += (profit / (item.PurchasePrice == 0 ? 1 : item.PurchasePrice)) * 100; // avoid div by 0
                             soldCount++;
                             break;
 
@@ -300,6 +339,18 @@ namespace CSharpResaleBusinessTracker
             SetTextBlock(AverageSalePriceTextBlock, $"Average Sale Price: {avgSalePrice.ToString("C", CultureInfo.CurrentCulture)}");
             SetTextBlock(InventoryTurnoverRateTextBlock, $"Turnover Rate: {turnoverRate:F2}");
             SetTextBlock(ExpensesTextBlock, $"Expenses: {expensesTotal.ToString("C", CultureInfo.CurrentCulture)}");
+            SetTextBlock(ShippingTextBlock, $"Shipping Costs: {totalShipping.ToString("C", CultureInfo.CurrentCulture)}");
+            SetTextBlock(FeesTextBlock, $"Fees: {totalFees.ToString("C", CultureInfo.CurrentCulture)}");
+
+            // Set ROI color
+            if (roi < RoiThreshold - YellowLeeway)
+                ReturnOnInventmentTextBlock.Foreground = Brushes.IndianRed;
+            else if (roi >= RoiThreshold - YellowLeeway && roi <= RoiThreshold + YellowLeeway)
+                ReturnOnInventmentTextBlock.Foreground = Brushes.Goldenrod;
+            else
+                ReturnOnInventmentTextBlock.Foreground = Brushes.LightGreen;
+
+            ApplyRowColoring();
 
             // Add lifecycle stage breakdown
             Dictionary<int, string> stageLabels = new Dictionary<int, string>
@@ -329,6 +380,31 @@ namespace CSharpResaleBusinessTracker
             if (tb != null)
                 tb.Text = text;
         }
+        private void ApplyRowColoring()
+        {
+            foreach (var inv in inventory)
+            {
+                if (inv.LifecycleIndex == 3 && inv.PurchasePrice > 0)
+                {
+                    double roi = ((inv.SellingPrice - inv.PurchasePrice) / inv.PurchasePrice) * 100;
+                    double threshold = RoiThreshold;
+                    double leeway = YellowLeeway;
+
+                    if (roi < threshold - leeway)
+                        inv.RowColor = Brushes.IndianRed;
+                    else if (roi <= threshold + leeway)
+                        inv.RowColor = Brushes.Goldenrod;
+                    else
+                        inv.RowColor = Brushes.LightGreen;
+                }
+                else
+                {
+                    inv.RowColor = Brushes.White;
+                }
+            }
+        }
+
+
         #endregion
 
         #region Button Logic
@@ -367,8 +443,11 @@ namespace CSharpResaleBusinessTracker
                     LifecycleIndex = lifecycleIndex,
                     ItemNotes = "",
                     AttachmentPaths = "",
+                    Shipping = 0,
+                    Fees = 0,
                 };
 
+                ApplyRowColoring();
                 inventory.Add(item);
                 DatabaseHelper.AddInventoryItem(item);
                 UpdateDashboard();
@@ -695,6 +774,18 @@ namespace CSharpResaleBusinessTracker
                 var viewer = new AttachmentViewerWindow(paths, selectedItem);
                 viewer.Owner = this;
                 viewer.ShowDialog();
+            }
+        }
+
+        private void OpenSettings_Click(object sender, RoutedEventArgs e)
+        {
+            var settingsWindow = new SettingsWindow(RoiThreshold);
+            settingsWindow.Owner = this;
+
+            if (settingsWindow.ShowDialog() == true)
+            {
+                RoiThreshold = settingsWindow.Threshold;
+                ApplyRowColoring(); // re-evaluate with new threshold
             }
         }
 
