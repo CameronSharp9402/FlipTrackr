@@ -29,6 +29,86 @@ namespace CSharpResaleBusinessTracker
         private double shipping;
         private double fees;
         private Brush rowColor = Brushes.White;
+        private string description;
+        private int itemConditionIndex;
+        private int shippingMethodIndex;
+        private string brand;
+
+        public string Brand
+        {
+            get => brand;
+            set
+            {
+                if (brand != value)
+                {
+                    brand = value;
+                    OnPropertyChanged(nameof(Brand));
+                }
+            }
+        }
+
+        public string ShippingMethodStage => ShippingMethodStages[ShippingMethodIndex];
+        public int ShippingMethodIndex
+        {
+            get => shippingMethodIndex;
+            set
+            {
+                if (shippingMethodIndex != value)
+                {
+                    shippingMethodIndex = value;
+                    OnPropertyChanged(nameof(ShippingMethodIndex));
+                    OnPropertyChanged(nameof(ShippingMethodStages));
+                }
+            }
+        }
+
+        public static readonly List<string> ShippingMethodStages = new List<string>
+        {
+        "Buyer - USPS",
+        "Buyer - UPS",
+        "Buyer - FedEx",
+        "Seller - USPS",
+        "Seller - UPS",
+        "Seller - FedEx"
+        };
+
+        public string ItemConditionStage => ItemConditionStages[ItemConditionIndex];
+
+        public int ItemConditionIndex
+        {
+            get => itemConditionIndex;
+            set
+            {
+                if (itemConditionIndex != value)
+                {
+                    itemConditionIndex = value;
+                    OnPropertyChanged(nameof(ItemConditionIndex));
+                    OnPropertyChanged(nameof(ItemConditionStages));
+                }
+            }
+        }
+
+        public static readonly List<string> ItemConditionStages = new List<string>
+        {
+        "New",
+        "Like New",
+        "Good",
+        "Fair",
+        "Poor"
+        };
+
+        public string Description
+        {
+            get => description;
+            set
+            {
+                if (description != value)
+                {
+                    description = value;
+                    OnPropertyChanged(nameof(Description));
+                }
+            }
+        }
 
         public double Fees
         {
@@ -176,6 +256,12 @@ namespace CSharpResaleBusinessTracker
             }
         }
 
+        public static readonly List<string> MarketplaceOptions = new List<string>
+        {
+        "Amazon", "eBay", "Mercari", "Facebook Marketplace",
+        "OfferUp", "Craigslist", "Etsy", "Poshmark", "Depop", "Whatnot", "Other"
+        };
+
         public string LifecycleStage => LifecycleStages[LifecycleIndex];
 
         public int LifecycleIndex
@@ -191,12 +277,6 @@ namespace CSharpResaleBusinessTracker
                 }
             }
         }
-
-        public static readonly List<string> MarketplaceOptions = new List<string>
-        {
-        "Amazon", "eBay", "Mercari", "Facebook Marketplace",
-        "OfferUp", "Craigslist", "Etsy", "Poshmark", "Depop", "Whatnot", "Other"
-        };
 
         public static readonly List<string> LifecycleStages = new List<string>
         {

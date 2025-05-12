@@ -47,8 +47,10 @@ namespace CSharpResaleBusinessTracker
             CREATE TABLE IF NOT EXISTS Inventory (
                 Id INTEGER PRIMARY KEY AUTOINCREMENT,
                 ItemName TEXT,
+                Brand TEXT,
                 Category TEXT,
                 Marketplace INTEGER,
+                Description TEXT,
                 PurchasePrice REAL,
                 SellingPrice REAL,
                 DatePurchased TEXT,
@@ -56,6 +58,8 @@ namespace CSharpResaleBusinessTracker
                 IsSold INTEGER,
                 Tags TEXT,
                 Stage INTEGER,
+                ItemCondition INTEGER,
+                ShippingMethod INTEGER,
                 ItemNotes TEXT,
                 AttachmentPaths TEXT,
                 Shipping INTEGER,
@@ -179,12 +183,14 @@ namespace CSharpResaleBusinessTracker
                 var command = connection.CreateCommand();
                 command.CommandText =
                 @"
-                INSERT INTO Inventory (ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths, Shipping, Fees)
-                VALUES ($itemname, $category, $marketplaceIndex, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex, $itemNotes, $attachmentPaths, $shipping, $fees);
+                INSERT INTO Inventory (ItemName, Brand, Category, Marketplace, Description, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemCondition, ShippingMethod, ItemNotes, AttachmentPaths, Shipping, Fees)
+                VALUES ($itemname, $brand, $category, $marketplaceIndex, $description, $purchasePrice, $sellingPrice, $datePurchased, $sku, $isSold, $tags, $lifecycleIndex, $itemConditionIndex, $shippingMethodIndex, $itemNotes, $attachmentPaths, $shipping, $fees);
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
+                command.Parameters.AddWithValue("$brand", item.Brand);
                 command.Parameters.AddWithValue("$category", item.Category ?? "Unknown");
                 command.Parameters.AddWithValue("$marketplaceIndex", item.MarketplaceIndex);
+                command.Parameters.AddWithValue("$description", item.Description);
                 command.Parameters.AddWithValue("$purchasePrice", item.PurchasePrice);
                 command.Parameters.AddWithValue("$sellingPrice", item.SellingPrice);
                 command.Parameters.AddWithValue("$datePurchased", item.DatePurchased);
@@ -192,6 +198,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$isSold", item.IsSold ? 1 : 0);
                 command.Parameters.AddWithValue("$tags", item.Tags);
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
+                command.Parameters.AddWithValue("$itemConditionIndex", item.ItemConditionIndex);
+                command.Parameters.AddWithValue("$shippingMethodIndex", item.ShippingMethodIndex);
                 command.Parameters.AddWithValue("$itemNotes", item.ItemNotes ?? "");
                 command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths);
                 command.Parameters.AddWithValue("$shipping", item.Shipping);
@@ -207,7 +215,7 @@ namespace CSharpResaleBusinessTracker
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, ItemName, Category, Marketplace, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemNotes, AttachmentPaths, Shipping, Fees FROM Inventory;";
+                command.CommandText = "SELECT Id, ItemName, Brand, Category, Marketplace, Description, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemCondition, ShippingMethod, ItemNotes, AttachmentPaths, Shipping, Fees FROM Inventory;";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -216,19 +224,23 @@ namespace CSharpResaleBusinessTracker
                           {
                               Id = reader.GetInt32(0),  // Read the Id field
                               ItemName = reader.GetString(1),
-                              Category = reader.IsDBNull(2) ? null : reader.GetString(2),
-                              MarketplaceIndex = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
-                              PurchasePrice = reader.GetDouble(4),
-                              SellingPrice = reader.GetDouble(5),
-                              DatePurchased = reader.GetString(6),
-                              SKU = reader.GetString(7),
-                              IsSold = reader.GetInt32(8) == 1,
-                              Tags = reader.GetString(9),
-                              LifecycleIndex = reader.IsDBNull(10) ? 0 : reader.GetInt32(10),
-                              ItemNotes = reader.GetString(11),
-                              AttachmentPaths = reader.IsDBNull(12) ? null : reader.GetString(12),
-                              Shipping = reader.GetDouble(13),
-                              Fees = reader.GetDouble(14),
+                              Brand = reader.GetString(2),
+                              Category = reader.IsDBNull(3) ? null : reader.GetString(3),
+                              MarketplaceIndex = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
+                              Description = reader.GetString(5),
+                              PurchasePrice = reader.GetDouble(6),
+                              SellingPrice = reader.GetDouble(7),
+                              DatePurchased = reader.GetString(8),
+                              SKU = reader.GetString(9),
+                              IsSold = reader.GetInt32(10) == 1,
+                              Tags = reader.GetString(11),
+                              LifecycleIndex = reader.IsDBNull(12) ? 0 : reader.GetInt32(12),
+                              ItemConditionIndex = reader.IsDBNull(13) ? 0 : reader.GetInt32(13),
+                              ShippingMethodIndex = reader.IsDBNull(14) ? 0 : reader.GetInt32(14),
+                              ItemNotes = reader.GetString(15),
+                              AttachmentPaths = reader.IsDBNull(16) ? null : reader.GetString(16),
+                              Shipping = reader.GetDouble(17),
+                              Fees = reader.GetDouble(18),
                           });
                     }
                 }
@@ -317,8 +329,10 @@ namespace CSharpResaleBusinessTracker
                 UPDATE Inventory
                 SET 
                     ItemName = $itemname, 
+                    Brand = $brand,
                     Category = $category, 
                     Marketplace = $marketplaceIndex,
+                    Description = $description,
                     PurchasePrice = $purchasePrice, 
                     SellingPrice = $sellingPrice, 
                     DatePurchased = $datePurchased, 
@@ -326,6 +340,8 @@ namespace CSharpResaleBusinessTracker
                     IsSold = $isSold,
                     Tags = $tags,
                     Stage = $lifecycleIndex,
+                    ItemCondition = $itemConditionIndex,
+                    ShippingMethod = $shippingMethodIndex,
                     ItemNotes = $itemNotes,
                     AttachmentPaths = $attachmentPaths,
                     Shipping = $shipping,
@@ -333,8 +349,10 @@ namespace CSharpResaleBusinessTracker
                 WHERE Id = $id;
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
+                command.Parameters.AddWithValue("$brand", item.Brand);
                 command.Parameters.AddWithValue("$category", item.Category);
                 command.Parameters.AddWithValue("$marketplaceIndex", item.MarketplaceIndex);
+                command.Parameters.AddWithValue("$description", item.Description);
                 command.Parameters.AddWithValue("$purchasePrice", item.PurchasePrice);
                 command.Parameters.AddWithValue("$sellingPrice", item.SellingPrice);
                 command.Parameters.AddWithValue("$datePurchased", item.DatePurchased);
@@ -342,6 +360,8 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$isSold", item.IsSold ? 1 : 0);
                 command.Parameters.AddWithValue("$tags", item.Tags ?? string.Empty);
                 command.Parameters.AddWithValue("$lifecycleIndex", item.LifecycleIndex);
+                command.Parameters.AddWithValue("$itemConditionIndex", item.ItemConditionIndex);
+                command.Parameters.AddWithValue("$shippingMethodIndex", item.ShippingMethodIndex);
                 command.Parameters.AddWithValue("$itemNotes", item.ItemNotes);
                 command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths ?? string.Empty);
                 command.Parameters.AddWithValue("$shipping", item.Shipping);

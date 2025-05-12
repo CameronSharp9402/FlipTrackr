@@ -34,6 +34,8 @@ namespace CSharpResaleBusinessTracker
         public double RoiThreshold { get; set; }
         public double YellowLeeway { get; set; } = 5;   // ±5% around threshold
 
+        private readonly string AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"FlipTrackr");
+
         public MainWindow()
         {
             SQLitePCL.Batteries_V2.Init();
@@ -248,6 +250,28 @@ namespace CSharpResaleBusinessTracker
                 UpdateDashboard(); // <-- Trigger immediate UI update
             }
         }
+        private void ItemConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = (ComboBox)sender;
+            var selectedItem = (InventoryItem)comboBox.DataContext;
+
+            if (selectedItem != null && comboBox.SelectedIndex >= 0)
+            {
+                selectedItem.ItemConditionIndex = comboBox.SelectedIndex;
+                DatabaseHelper.UpdateInventoryItem(selectedItem); // Assuming this saves to DB
+            }
+        }
+        private void ShippingMethodComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = (ComboBox)sender;
+            var selectedItem = (InventoryItem)comboBox.DataContext;
+
+            if (selectedItem != null && comboBox.SelectedIndex >= 0)
+            {
+                selectedItem.ShippingMethodIndex = comboBox.SelectedIndex;
+                DatabaseHelper.UpdateInventoryItem(selectedItem); // Assuming this saves to DB
+            }
+        }
         public void UpdateRoiThreshold(double newThreshold)
         {
             RoiThreshold = newThreshold;
@@ -416,15 +440,20 @@ namespace CSharpResaleBusinessTracker
                 string category = CategoryComboBox.SelectedItem as string ?? "Uncategorized"; // Default to "Uncategorized" if no selection is made
                 int marketplaceIndex = MarketplaceInputComboBox.SelectedIndex;
                 int lifecycleIndex = LifecycleComboBox.SelectedIndex;
+                int itemConditionIndex = ItemConditionComboBox.SelectedIndex;
+                int shippingMethodIndex = ShippingMethodComboBox.SelectedIndex;
 
                 if (!double.TryParse(PurchasePriceBox.Text, out double purchasePrice) ||
                     !double.TryParse(SellingPriceBox.Text, out double sellingPrice) ||
                     string.IsNullOrWhiteSpace(ItemNameBox.Text) ||
+                    string.IsNullOrWhiteSpace(BrandNameBox.Text) ||
                     string.IsNullOrWhiteSpace(SkuBox.Text) ||
                     !DateBox.SelectedDate.HasValue ||
                     CategoryComboBox.SelectedIndex == 0 ||
                     MarketplaceInputComboBox.SelectedIndex == 0 ||
-                    LifecycleComboBox.SelectedIndex == 0)
+                    LifecycleComboBox.SelectedIndex == 0 ||
+                    ItemConditionComboBox.SelectedIndex == 0 ||
+                    ShippingMethodComboBox.SelectedIndex == 0)
                 {
                     MessageBox.Show("Please enter valid item info.");
                     return;
@@ -435,12 +464,16 @@ namespace CSharpResaleBusinessTracker
                     Category = category,
                     MarketplaceIndex = marketplaceIndex,
                     ItemName = ItemNameBox.Text,
+                    Brand = BrandNameBox.Text,
+                    Description = "",
                     PurchasePrice = purchasePrice,
                     SellingPrice = sellingPrice,
                     SKU = SkuBox.Text,
                     DatePurchased = DateBox.SelectedDate.Value.ToString("MM/dd/yyyy"),
                     Tags = TagsBox.Text,
                     LifecycleIndex = lifecycleIndex,
+                    ItemConditionIndex = itemConditionIndex,
+                    ShippingMethodIndex = shippingMethodIndex,
                     ItemNotes = "",
                     AttachmentPaths = "",
                     Shipping = 0,
@@ -499,6 +532,8 @@ namespace CSharpResaleBusinessTracker
             CategoryComboBox.SelectedIndex = 0;
             MarketplaceInputComboBox.SelectedIndex = 0;
             LifecycleComboBox.SelectedIndex = 0;
+            ItemConditionComboBox.SelectedIndex = 0;
+            ShippingMethodComboBox.SelectedIndex = 0;
 
             // Optionally set focus back to the first field
             ItemNameBox.Focus();
@@ -777,6 +812,7 @@ namespace CSharpResaleBusinessTracker
             }
         }
 
+        #region Menu Bar Buttons
         private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
             var settingsWindow = new SettingsWindow(RoiThreshold);
@@ -788,6 +824,125 @@ namespace CSharpResaleBusinessTracker
                 ApplyRowColoring(); // re-evaluate with new threshold
             }
         }
+        private void SaveAll_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var item in InventoryTable.Items.OfType<InventoryItem>())
+                DatabaseHelper.UpdateInventoryItem(item);
+
+            foreach (var exp in ExpenseTable.Items.OfType<Expenses>())
+                DatabaseHelper.UpdateExpenseItem(exp);
+
+            MessageBox.Show("All data saved successfully.", "Save All");
+        }
+
+        private void CreateBackup_Click(object sender, RoutedEventArgs e)
+        {
+            string dbPath = Path.Combine(AppDataPath, "fliptrackr.db");
+            string backupDir = Path.Combine(AppDataPath, "Backups");
+            Directory.CreateDirectory(backupDir);
+
+            string backupFile = Path.Combine(backupDir, $"fliptrackr_backup_{DateTime.Now:yyyyMMdd_HHmmss}.db");
+
+            try
+            {
+                File.Copy(dbPath, backupFile, true);
+                MessageBox.Show($"Backup created:\n{backupFile}", "Backup Created");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error creating backup:\n{ex.Message}", "Error");
+            }
+        }
+
+        private void RestoreBackup_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Title = "Select a backup file",
+                Filter = "SQLite Database (*.db)|*.db",
+                InitialDirectory = Path.Combine(AppDataPath, "Backups")
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string dbPath = Path.Combine(AppDataPath, "fliptrackr.db");
+
+                try
+                {
+                    File.Copy(dialog.FileName, dbPath, true);
+                    MessageBox.Show("Backup restored.\nPlease restart the application.", "Restore Complete");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error restoring backup:\n{ex.Message}", "Error");
+                }
+            }
+        }
+        private void ExportInventoryToCsv_Click(object sender, RoutedEventArgs e)
+        {
+            string dbPath = Path.Combine(AppDataPath, "fliptrackr.db");
+            string exportDir = Path.Combine(AppDataPath, "Exports");
+            Directory.CreateDirectory(exportDir);
+
+            var saveDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Title = "Export Inventory to CSV",
+                Filter = "CSV files (*.csv)|*.csv",
+                FileName = $"inventory_export_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using (var writer = new StreamWriter(saveDialog.FileName))
+                    {
+                        // Header row
+                        writer.WriteLine("Item Name,Brand,Category,Description,Purchase Price,Selling Price,Date Purchased,SKU,Marketplace,Stage,Item Condition,Shipping Method,Shipping,Fees,Tags,Notes");
+
+                        foreach (var item in inventory)
+                        {
+                            string line = string.Join(",",
+                                EscapeForCsv(item.ItemName),
+                                EscapeForCsv(item.Brand),
+                                EscapeForCsv(item.Category),
+                                EscapeForCsv(item.Description),
+                                item.PurchasePrice.ToString("F2", CultureInfo.InvariantCulture),
+                                item.SellingPrice.ToString("F2", CultureInfo.InvariantCulture),
+                                EscapeForCsv(item.DatePurchased),
+                                EscapeForCsv(item.SKU),
+                                EscapeForCsv(item.MarketplaceName),
+                                EscapeForCsv(item.LifecycleStage),
+                                EscapeForCsv(item.ItemConditionStage),
+                                EscapeForCsv(item.ShippingMethodStage),
+                                item.Shipping.ToString("F2", CultureInfo.InvariantCulture),
+                                item.Fees.ToString("F2", CultureInfo.InvariantCulture),
+                                EscapeForCsv(item.Tags),
+                                EscapeForCsv(item.ItemNotes));
+
+                            writer.WriteLine(line);
+                        }
+                    }
+
+                    MessageBox.Show("Inventory exported successfully.", "Export Complete");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error exporting inventory:\n{ex.Message}", "Error");
+                }
+            }
+        }
+
+        // Helper to escape commas/quotes
+        private string EscapeForCsv(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input)) return "";
+            if (input.Contains(",") || input.Contains("\""))
+                return $"\"{input.Replace("\"", "\"\"")}\"";
+            return input;
+        }
+
+        #endregion
 
         #endregion
 

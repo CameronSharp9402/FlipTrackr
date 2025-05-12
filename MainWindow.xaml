@@ -7,8 +7,8 @@
         xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
         mc:Ignorable="d"
         Title="FlipTrackr" 
-        Height="750" Width="1260"
-        MinWidth="1260" MinHeight="750"
+        Width="1700" Height="900" 
+        MinWidth="1700" MinHeight="900"
         MaxWidth="1920" MaxHeight="1080"
         ResizeMode="CanResize">
 
@@ -17,10 +17,14 @@
 
 <!--#region Menu Bar -->
             <Menu DockPanel.Dock="Top">
-                
-<!--#region File Tab -->
-                <MenuItem Header="File">
-                    
+
+                <!--#region File Tab -->
+                <MenuItem Header="_File">
+                    <MenuItem Header="Save All" Click="SaveAll_Click"/>
+                    <Separator />
+                    <MenuItem Header="Create Backup" Click="CreateBackup_Click"/>
+                    <MenuItem Header="Restore Backup" Click="RestoreBackup_Click"/>
+                    <MenuItem Header="Export Inventory to CSV" Click="ExportInventoryToCsv_Click"/>
                 </MenuItem>
 <!--#endregion-->                
 
@@ -100,6 +104,8 @@
                                     </ComboBox>
                                     <TextBlock Text="Item Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
                                     <TextBox x:Name="ItemNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
+                                    <TextBlock Text="Brand" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBox x:Name="BrandNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
                                     <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
                                     <TextBox x:Name="PurchasePriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
                                     <TextBlock Text="Selling Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
@@ -120,6 +126,23 @@
                                         <ComboBoxItem Content="Sold"/>
                                         <ComboBoxItem Content="Returned"/>
                                         <ComboBoxItem Content="Other"/>
+                                    </ComboBox>
+                                    <ComboBox x:Name="ItemConditionComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ItemConditionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
+                                        <ComboBoxItem Content="Item Condition"/>
+                                        <ComboBoxItem Content="New"/>
+                                        <ComboBoxItem Content="Like New"/>
+                                        <ComboBoxItem Content="Good"/>
+                                        <ComboBoxItem Content="Fair"/>
+                                        <ComboBoxItem Content="Poor"/>
+                                    </ComboBox>
+                                    <ComboBox x:Name="ShippingMethodComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ShippingMethodIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
+                                        <ComboBoxItem Content="Shipping Method"/>
+                                        <ComboBoxItem Content="Buyer - USPS"/>
+                                        <ComboBoxItem Content="Buyer - UPS"/>
+                                        <ComboBoxItem Content="Buyer - FedEx"/>
+                                        <ComboBoxItem Content="Seller - USPS"/>
+                                        <ComboBoxItem Content="Seller - UPS"/>
+                                        <ComboBoxItem Content="Seller - FedEx"/>
                                     </ComboBox>
                                     <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0"/>
                                     <Separator Margin="75 0 5 0"/>
@@ -199,6 +222,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Brand" Binding="{Binding Brand, UpdateSourceTrigger=PropertyChanged}"/>
                                     <DataGridTextColumn Header="Category" Binding="{Binding Category, UpdateSourceTrigger=PropertyChanged}" />
                                     <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}">
                                         <DataGridTextColumn.EditingElementStyle>
@@ -217,6 +241,7 @@
                                         </DataGridTextColumn.EditingElementStyle>
                                     </DataGridTextColumn>
                                     <DataGridTextColumn Header="Date Purchased" Binding="{Binding DatePurchased, UpdateSourceTrigger=PropertyChanged}" />
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
                                     <DataGridTextColumn Header="SKU" Binding="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
                                     <DataGridTemplateColumn Header="Marketplace">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -252,7 +277,36 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="Shipping" Binding="{Binding Shipping, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}" >
+                                    <DataGridTemplateColumn Header="Item Condition">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox x:Name="ItemConditionTableComboBox" Width="125" Margin="5 0 10 0" SelectedIndex="{Binding ItemConditionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ItemConditionComboBox_SelectionChanged">
+                                                    <ComboBoxItem Content="Item Condition" IsEnabled="False"/>
+                                                    <ComboBoxItem Content="New"/>
+                                                    <ComboBoxItem Content="Like New"/>
+                                                    <ComboBoxItem Content="Good"/>
+                                                    <ComboBoxItem Content="Fair"/>
+                                                    <ComboBoxItem Content="Poor"/>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Shipping Method">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox x:Name="ShippingMethoTabledComboBox" Width="125" Margin="5 0 10 0" SelectedIndex="{Binding ShippingMethodIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionChanged="ShippingMethodComboBox_SelectionChanged">
+                                                    <ComboBoxItem Content="Shipping Method" IsEnabled="False"/>
+                                                    <ComboBoxItem Content="Buyer - USPS"/>
+                                                    <ComboBoxItem Content="Buyer - UPS"/>
+                                                    <ComboBoxItem Content="Buyer - FedEx"/>
+                                                    <ComboBoxItem Content="Seller - USPS"/>
+                                                    <ComboBoxItem Content="Seller - UPS"/>
+                                                    <ComboBoxItem Content="Seller - FedEx"/>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Shipping Fees" Binding="{Binding Shipping, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=F2}" >
                                         <DataGridTextColumn.EditingElementStyle>
                                             <Style TargetType="TextBox">
                                                 <Setter Property="HorizontalContentAlignment" Value="Right" />
