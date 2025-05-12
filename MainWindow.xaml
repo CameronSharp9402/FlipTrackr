@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         Title="FlipTrackr" 
         Width="1700" Height="900" 
@@ -417,11 +418,17 @@
                     </TabItem>
 <!--#endregion-->
                     
-<!--#region Reports Tab -->                    
+<!--#region Reports Tab -->
                     <TabItem Header="Reports">
-                        <StackPanel Margin="10">
-                            <TextBlock Text="Coming Soon..." FontSize="16"/>
-                        </StackPanel>
+                        <lvc:CartesianChart Series="{Binding DashboardSeries}" LegendLocation="Bottom">
+                            <lvc:CartesianChart.AxisX>
+                                <lvc:Axis Title="Month" LabelFormatter="{Binding XValueFormatter}" LabelsRotation="15"/>
+                            </lvc:CartesianChart.AxisX>
+                            <lvc:CartesianChart.AxisY>
+                                <lvc:Axis Title="USD ($)" LabelFormatter="{Binding CurrencyFormatter}" />
+                            </lvc:CartesianChart.AxisY>
+                        </lvc:CartesianChart>
+
                     </TabItem>
 <!--#endregion-->
                 </TabControl>
