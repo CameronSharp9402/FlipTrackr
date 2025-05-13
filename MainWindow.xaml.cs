@@ -39,14 +39,94 @@ namespace CSharpResaleBusinessTracker
 
         private readonly string AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"FlipTrackr");
 
-        public SeriesCollection DashboardSeries { get; set; }
+        public ObservableCollection<SeriesViewModel> DashboardSeriesViewModels { get; set; } = new ObservableCollection<SeriesViewModel>();
+        public SeriesCollection DashboardSeries { get; set; } = new SeriesCollection();
         public ObservableCollection<string> DashboardLabels { get; set; } = new ObservableCollection<string>();
         public Func<double, string> XValueFormatter { get; set; }
         public Func<double, string> CurrencyFormatter { get; set; }
 
+        private DateTime? reportFilterStartDate = null;
+        private DateTime? reportFilterEndDate = null;
+        private Dictionary<string, bool> seriesVisibility = new Dictionary<string, bool>();
+
         public MainWindow()
         {
             SQLitePCL.Batteries_V2.Init();
+
+            XValueFormatter = value => new DateTime((long)value).ToString("MM / dd / yyyy");
+            DashboardLabels = new ObservableCollection<string>();
+            CurrencyFormatter = value => value.ToString("C2"); // $0.00
+            var rawSeriesList = new List<SeriesViewModel>
+{
+                new SeriesViewModel
+                {
+                    Title = "Revenue",
+                    Series = new LineSeries
+                    {
+                        Title = "Revenue",
+                        Values = new ChartValues<DateTimePoint>(),
+                        LineSmoothness = 1,
+                        PointGeometrySize = 8,
+                        Stroke = Brushes.SteelBlue
+                    }
+                },
+                new SeriesViewModel
+                {
+                    Title = "Cost",
+                    Series = new LineSeries
+                    {
+                        Title = "Cost",
+                        Values = new ChartValues<DateTimePoint>(),
+                        LineSmoothness = 1,
+                        PointGeometrySize = 8,
+                        Stroke = Brushes.IndianRed
+                    }
+                },
+                new SeriesViewModel
+                {
+                    Title = "Profit",
+                    Series = new LineSeries
+                    {
+                        Title = "Profit",
+                        Values = new ChartValues<DateTimePoint>(),
+                        LineSmoothness = 1,
+                        PointGeometrySize = 8,
+                        Stroke = Brushes.DarkGreen
+                    }
+                },
+                new SeriesViewModel
+                {
+                    Title = "Shipping",
+                    Series = new LineSeries
+                    {
+                        Title = "Shipping",
+                        Values = new ChartValues<DateTimePoint>(),
+                        LineSmoothness = 1,
+                        PointGeometrySize = 8,
+                        Stroke = Brushes.MediumPurple
+                    }
+                },
+                new SeriesViewModel
+                {
+                    Title = "Fees",
+                    Series = new LineSeries
+                    {
+                        Title = "Fees",
+                        Values = new ChartValues<DateTimePoint>(),
+                        LineSmoothness = 1,
+                        PointGeometrySize = 8,
+                        Stroke = Brushes.Orange
+                    }
+                }
+            };
+
+            foreach (var vm in rawSeriesList)
+            {
+                DashboardSeries.Add(vm.Series);
+                DashboardSeriesViewModels.Add(vm);
+                seriesVisibility[vm.Title] = true;
+            }
+
             InitializeComponent();
 
             var settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr", "settings.txt");
@@ -84,55 +164,6 @@ namespace CSharpResaleBusinessTracker
             }
             inventory = new ObservableCollection<InventoryItem>(items);
             expense = new ObservableCollection<Expenses>(DatabaseHelper.LoadExpenseItems());
-
-            XValueFormatter = index =>
-            {
-                if (index >= 0 && index < DashboardLabels.Count)
-                    return DashboardLabels[(int)index];
-                return "";
-            };
-
-            DashboardLabels = new ObservableCollection<string>();
-            CurrencyFormatter = value => value.ToString("C2"); // $0.00
-
-            DashboardSeries = new SeriesCollection
-            {
-                new LineSeries
-                {
-                    Title = "Revenue",
-                    Values = new ChartValues<ObservablePoint>(),
-                    LineSmoothness = 0.5,
-                    PointGeometrySize = 8
-                },
-                new LineSeries
-                {
-                    Title = "Cost",
-                    Values = new ChartValues<ObservablePoint>(),
-                    LineSmoothness = 0.5,
-                    PointGeometrySize = 8
-                },
-                new LineSeries
-                {
-                    Title = "Profit",
-                    Values = new ChartValues<ObservablePoint>(),
-                    LineSmoothness = 0.5,
-                    PointGeometrySize = 8
-                },
-                new LineSeries
-                {
-                    Title = "Shipping",
-                    Values = new ChartValues<ObservablePoint>(),
-                    LineSmoothness = 0.5,
-                    PointGeometrySize = 8
-                },
-                new LineSeries
-                {
-                    Title = "Fees",
-                    Values = new ChartValues<ObservablePoint>(),
-                    LineSmoothness = 0.5,
-                    PointGeometrySize = 8
-                }
-            };
 
             // Set item sources
             InventoryTable.ItemsSource = inventory;
@@ -363,14 +394,8 @@ namespace CSharpResaleBusinessTracker
 
                     switch (item.LifecycleIndex)
                     {
-                        case 1:
-                        case 2:
-                        case 4:
-                        case 5:
-                            totalCost += item.PurchasePrice;
-                            unsoldCount++;
-                            break;
-
+                        case 1: // Sourced
+                        case 2: // Listed
                         case 3: // Sold
                             double totalItemCost = item.PurchasePrice + item.Shipping + item.Fees;
                             double profit = item.SellingPrice - totalItemCost;
@@ -382,6 +407,11 @@ namespace CSharpResaleBusinessTracker
                             totalRevenue += item.SellingPrice;
                             totalROI += (profit / (item.PurchasePrice == 0 ? 1 : item.PurchasePrice)) * 100;
                             soldCount++;
+                            break;
+                        case 4: // Returned
+                        case 5: // Pending
+                            totalCost += item.PurchasePrice;
+                            unsoldCount++;
                             break;
                     }
                 }
@@ -419,9 +449,13 @@ namespace CSharpResaleBusinessTracker
 
             // Lifecycle stage summary
             var stageLabels = new Dictionary<int, string>
-    {
-        { 1, "Sourced" }, { 2, "Listed" }, { 3, "Sold" }, { 4, "Returned" }, { 5, "Pending" }
-    };
+            {
+                { 1, "Sourced" }, 
+                { 2, "Listed" }, 
+                { 3, "Sold" }, 
+                { 4, "Returned" }, 
+                { 5, "Pending" }
+            };
             var stageCounts = DatabaseHelper.GetStageCounts();
             StringBuilder stageSummaryBuilder = new StringBuilder();
             foreach (var kvp in stageLabels)
@@ -431,49 +465,43 @@ namespace CSharpResaleBusinessTracker
             }
             SetTextBlock(StageSummaryTextBlock, stageSummaryBuilder.ToString());
 
-            // Clear previous graph data
+            // === Graph Data Reset ===
             DashboardLabels.Clear();
             foreach (var series in DashboardSeries)
                 series.Values.Clear();
 
-            var datedItems = inventory
-                .Where(inv => DateTime.TryParse(inv.DatePurchased, out _))
-                .Select(inv => new { Item = inv, Date = DateTime.Parse(inv.DatePurchased) })
-                .ToList();
+            // === Group inventory data by day ===
+            var groupedByDate = inventory
+                .Where(i => DateTime.TryParse(i.DatePurchased, out DateTime parsedDate) &&
+                           (!reportFilterStartDate.HasValue || parsedDate >= reportFilterStartDate) &&
+                           (!reportFilterEndDate.HasValue || parsedDate <= reportFilterEndDate))
+                .GroupBy(i => DateTime.Parse(i.DatePurchased).Date)
+                .OrderBy(g => g.Key);
 
-            if (datedItems.Any())
+            foreach (var group in groupedByDate)
             {
-                var firstMonth = new DateTime(datedItems.Min(x => x.Date).Year, datedItems.Min(x => x.Date).Month, 1);
-                var lastMonth = new DateTime(datedItems.Max(x => x.Date).Year, datedItems.Max(x => x.Date).Month, 1);
+                DateTime date = group.Key;
+                DashboardLabels.Add(date.ToString("MMM dd"));
 
-                var monthRange = new List<DateTime>();
-                for (var date = firstMonth; date <= lastMonth; date = date.AddMonths(1))
-                    monthRange.Add(date);
+                double revenue = group.Where(i => i.LifecycleIndex == 3).Sum(i => i.SellingPrice);
+                double cost = group.Sum(i => i.PurchasePrice);
+                double profit = group.Where(i => i.LifecycleIndex == 3).Sum(i => i.SellingPrice - i.PurchasePrice);
+                double shipping = group.Sum(i => i.Shipping);
+                double fees = group.Sum(i => i.Fees);
 
-                int monthIndex = 0;
-                foreach (var monthStart in monthRange)
+                DashboardSeries[0].Values.Add(new DateTimePoint(date, Math.Round(revenue, 2)));
+                DashboardSeries[1].Values.Add(new DateTimePoint(date, Math.Round(cost, 2)));
+                DashboardSeries[2].Values.Add(new DateTimePoint(date, Math.Round(profit, 2)));
+                DashboardSeries[3].Values.Add(new DateTimePoint(date, Math.Round(shipping, 2)));
+                DashboardSeries[4].Values.Add(new DateTimePoint(date, Math.Round(fees, 2)));
+            }
+
+            foreach (var series in DashboardSeries)
+            {
+                if (series is LineSeries lineSeries)
                 {
-                    var monthEnd = monthStart.AddMonths(1);
-                    DashboardLabels.Add(monthStart.ToString("MMM yyyy"));
-
-                    var groupItems = datedItems
-                        .Where(x => x.Date >= monthStart && x.Date < monthEnd)
-                        .Select(x => x.Item)
-                        .ToList();
-
-                    double groupRevenue = groupItems.Where(it => it.LifecycleIndex == 3).Sum(it => it.SellingPrice);
-                    double groupCost = groupItems.Sum(it => it.PurchasePrice);
-                    double groupProfit = groupItems.Where(it => it.LifecycleIndex == 3).Sum(it => it.SellingPrice - it.PurchasePrice);
-                    double groupShipping = groupItems.Sum(it => it.Shipping);
-                    double groupFees = groupItems.Sum(it => it.Fees);
-
-                    DashboardSeries[0].Values.Add(new LiveCharts.Defaults.ObservablePoint(monthIndex, Math.Round(groupRevenue, 2)));
-                    DashboardSeries[1].Values.Add(new LiveCharts.Defaults.ObservablePoint(monthIndex, Math.Round(groupCost, 2)));
-                    DashboardSeries[2].Values.Add(new LiveCharts.Defaults.ObservablePoint(monthIndex, Math.Round(groupProfit, 2)));
-                    DashboardSeries[3].Values.Add(new LiveCharts.Defaults.ObservablePoint(monthIndex, Math.Round(groupShipping, 2)));
-                    DashboardSeries[4].Values.Add(new LiveCharts.Defaults.ObservablePoint(monthIndex, Math.Round(groupFees, 2)));
-
-                    monthIndex++;
+                    lineSeries.Visibility = Visibility.Visible;
+                    seriesVisibility[lineSeries.Title] = true;
                 }
             }
         }
@@ -887,6 +915,36 @@ namespace CSharpResaleBusinessTracker
                 var viewer = new AttachmentViewerWindow(paths, selectedItem);
                 viewer.Owner = this;
                 viewer.ShowDialog();
+            }
+        }
+        private void ApplyReportDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+            reportFilterStartDate = ReportStartDatePicker.SelectedDate;
+            reportFilterEndDate = ReportEndDatePicker.SelectedDate?.AddDays(1); // Inclusive
+
+            UpdateDashboard(); // This already drives the chart
+        }
+
+        private void ResetDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+            ReportStartDatePicker.SelectedDate = null;
+            ReportEndDatePicker.SelectedDate = null;
+            reportFilterStartDate = null;
+            reportFilterEndDate = null;
+
+            UpdateDashboard();
+        }
+
+        private void LegendItem_Click(object sender, MouseButtonEventArgs e)
+        {
+            var textBlock = sender as TextBlock;
+            var viewModel = textBlock?.DataContext as SeriesViewModel;
+
+            if (viewModel != null)
+            {
+                viewModel.IsVisible = !viewModel.IsVisible;
+                viewModel.Series.Visibility = viewModel.IsVisible ? Visibility.Visible : Visibility.Hidden;
+                // No need to manually set Foreground — WPF will update it
             }
         }
 

@@ -245,6 +245,8 @@
       <DependentUpon>QuickAddWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="SafeImageConverter1.cs" />
+    <Compile Include="SeriesViewModel.cs" />
+    <Compile Include="SeriesVisibilityToBrushConverter.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
