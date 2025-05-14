@@ -17,7 +17,6 @@ using LiveCharts;
 using LiveCharts.Wpf;
 using LiveCharts.Defaults;
 
-
 namespace CSharpResaleBusinessTracker
 {
     public partial class MainWindow : Window

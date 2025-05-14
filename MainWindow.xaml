@@ -7,83 +7,261 @@
         xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
-        Title="FlipTrackr" 
+        Title="FlipTrackr"
         Width="1700" Height="950" 
         MinWidth="1700" MinHeight="950"
         MaxWidth="1920" MaxHeight="1080"
         ResizeMode="CanResize">
-    
+   
+<!--#region UI FX-->
     <Window.Resources>
         <local:SeriesVisibilityToBrushConverter x:Key="SeriesColorConverter"/>
-    </Window.Resources>
 
-    <Grid>
-        <DockPanel>
+        <!-- Tab Item -->
+        <Style TargetType="TabItem">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="5 0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border x:Name="TabBorder"
+                        CornerRadius="4"
+                        Padding="10 5"
+                        Background="{TemplateBinding Background}">
+                            <Border.Effect>
+                                <DropShadowEffect x:Name="GlowEffect"
+                                          Color="#FFBEE6FD"
+                                          BlurRadius="10"
+                                          ShadowDepth="0"
+                                          Opacity="0" />
+                            </Border.Effect>
+                            <ContentPresenter x:Name="ContentSite"
+                                      ContentSource="Header"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- Hover detection moved to the actual tab header -->
+                            <Trigger SourceName="TabBorder" Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="GlowEffect"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="1"
+                                                     Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="GlowEffect"
+                                                     Storyboard.TargetProperty="Opacity"
+                                                     To="0"
+                                                     Duration="0:0:0.2"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#FF3B82F6"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <!-- Modern Scrollbars -->
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track Name="PART_Track">
+                                <Track.Thumb>
+                                    <Thumb Background="#AAA"/>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Hover Effects -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="{Binding RowColor}"/>
+            <Setter Property="ToolTip" Value="{Binding ItemName}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE8F0FE"/>
+                    <Setter Property="Cursor" Value="Hand"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Tab Transitions -->
+        <Style TargetType="TabControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabControl">
+                        <Grid>
+                            <TabPanel IsItemsHost="True" Margin="0,0,0,10"/>
+                            <ContentPresenter ContentSource="SelectedContent">
+                                <ContentPresenter.Triggers>
+                                    <EventTrigger RoutedEvent="ContentPresenter.Loaded">
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                         From="0" To="1"
+                                                         Duration="0:0:0.3" />
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger>
+                                </ContentPresenter.Triggers>
+                            </ContentPresenter>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Fonts -->
+        <Style TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable"/>
+        </Style>
+
+        <!-- Hover Animations -->
+        <Style x:Key="HoverButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#FFDDDDDD"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" >
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFBEE6FD"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#FFC4E5F6"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#FFC0C0C0"/>
+                                <Setter Property="Foreground" Value="#FF707070"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Section Container Style -->
+        <Style x:Key="CardStyle" TargetType="Border">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="15"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Fade-in on load -->
+        <Style TargetType="Grid" x:Key="FadeInGrid">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Grid.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                         From="0" To="1"
+                                         Duration="0:0:0.5"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+<!--#endregion-->
+
+    <Grid Background="{DynamicResource BackgroundBrush}" Style="{StaticResource FadeInGrid}">
+        <DockPanel Background="{DynamicResource BackgroundBrush}">
 
 <!--#region Menu Bar -->
-            <Menu DockPanel.Dock="Top">
+            <Menu DockPanel.Dock="Top" Background="{DynamicResource BackgroundBrush}">
 
                 <!--#region File Tab -->
-                <MenuItem Header="_File">
-                    <MenuItem Header="Save All" Click="SaveAll_Click"/>
+                <MenuItem Header="_File" Foreground="{DynamicResource ForegroundBrush}">
+                    <MenuItem Header="Save All" Click="SaveAll_Click" Background="{DynamicResource BackgroundBrush}"/>
                     <Separator />
-                    <MenuItem Header="Create Backup" Click="CreateBackup_Click"/>
-                    <MenuItem Header="Restore Backup" Click="RestoreBackup_Click"/>
-                    <MenuItem Header="Export Inventory to CSV" Click="ExportInventoryToCsv_Click"/>
+                    <MenuItem Header="Create Backup" Click="CreateBackup_Click" Background="{DynamicResource BackgroundBrush}"/>
+                    <MenuItem Header="Restore Backup" Click="RestoreBackup_Click" Background="{DynamicResource BackgroundBrush}"/>
+                    <MenuItem Header="Export Inventory to CSV" Click="ExportInventoryToCsv_Click" Background="{DynamicResource BackgroundBrush}"/>
                 </MenuItem>
 <!--#endregion-->                
 
 <!--#region Settings Tab -->
-                <MenuItem Header="Settings">
-                    <MenuItem Header="ROI Threshold" Click="OpenSettings_Click"/>
-                </MenuItem>
-<!--#endregion-->
+                <MenuItem Header="Settings" Foreground="{DynamicResource ForegroundBrush}" Click="OpenSettings_Click"/>
+                <!--#endregion-->
             </Menu>           
 <!--#endregion-->
             
 <!--#region Application Tabs-->
-            <Grid>
-                <TabControl Margin="10">
+            <Grid Background="{DynamicResource BackgroundBrush}" Style="{StaticResource FadeInGrid}">
+                <TabControl Margin="10" Background="{DynamicResource BackgroundBrush}">
 <!--#region Dashboard Tab-->
-                    <TabItem Header="Dashboard">
-                        <StackPanel Orientation="Vertical" Margin="10">
-                            <Grid Margin="10">
+                    <TabItem Header="Dashboard" Margin="5 0 -5 0">
+                        <StackPanel Orientation="Vertical" Margin="0 25 0 0">
+                            <Grid Margin="0 25 0 0" Style="{StaticResource FadeInGrid}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="FlipTrackr" FontSize="40" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="0" Text="FlipTrackr" FontSize="40" FontWeight="Bold" Margin="0 0 10 0" VerticalAlignment="Center" Foreground="{DynamicResource ForegroundBrush}"/>
                                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                    <Button Content="Today" Click="DashboardFilterButton_Click" Tag="Today" Margin="5" Height="35" Width="55" FontSize="15"/>
-                                    <Button Content="Yesterday" Click="DashboardFilterButton_Click" Tag="Yesterday" Margin="5" Height="35" Width="70" FontSize="15"/>
-                                    <Button Content="Last Week" Click="DashboardFilterButton_Click" Tag="LastWeek" Margin="5" Height="35" Width="80" FontSize="15"/>
-                                    <Button Content="Last Month" Click="DashboardFilterButton_Click" Tag="LastMonth" Margin="5" Height="35" Width="80" FontSize="15"/>
-                                    <Button Content="Last 3 Months" Click="DashboardFilterButton_Click" Tag="Last3Months" Margin="5" Height="35" Width="100" FontSize="15"/>
-                                    <Button Content="Last 6 Months" Click="DashboardFilterButton_Click" Tag="Last6Months" Margin="5" Height="35" Width="100" FontSize="15"/>
-                                    <Button Content="All-Time" Click="DashboardFilterButton_Click" Tag="AllTime" Margin="5" Height="35" Width="65" FontSize="15"/>
+                                    <Button Content="Today" Click="DashboardFilterButton_Click" Tag="Today" Margin="5" Height="35" Width="55" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Yesterday" Click="DashboardFilterButton_Click" Tag="Yesterday" Margin="5" Height="35" Width="70" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Last Week" Click="DashboardFilterButton_Click" Tag="LastWeek" Margin="5" Height="35" Width="80" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Last Month" Click="DashboardFilterButton_Click" Tag="LastMonth" Margin="5" Height="35" Width="80" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Last 3 Months" Click="DashboardFilterButton_Click" Tag="Last3Months" Margin="5" Height="35" Width="100" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Last 6 Months" Click="DashboardFilterButton_Click" Tag="Last6Months" Margin="5" Height="35" Width="100" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="All-Time" Click="DashboardFilterButton_Click" Tag="AllTime" Margin="5" Height="35" Width="65" FontSize="15" Style="{StaticResource HoverButtonStyle}"/>
                                 </StackPanel>
                             </Grid>
 
                             <!-- Dashboard Metrics  -->
-                            <TextBlock x:Name="StageSummaryTextBlock" Text="Loading stage summary..." FontWeight="Bold" FontSize="14" Margin="10" TextWrapping="Wrap"/>
-                            <TextBlock x:Name="TotalCostOfGoodsTextBlock" FontSize="16" Text="Total Cost Of Goods: $0.00" Margin="0 10"/>
-                            <TextBlock x:Name="GrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
-                            <TextBlock x:Name="RevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
-                            <TextBlock x:Name="GrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
-                            <TextBlock x:Name="ReturnOnInventmentTextBlock" FontSize="16" Text="Return On Investment (ROI): 0%" Margin="0 10"/>
-                            <TextBlock x:Name="AverageSalePriceTextBlock" FontSize="16" Text="Average Sale Price: $0" Margin="0 10"/>
-                            <TextBlock x:Name="InventoryTurnoverRateTextBlock" FontSize="16" Text="Turnover Rate = 0 items" Margin="0 10"/>
-                            <TextBlock x:Name="ExpensesTextBlock" FontSize="16" Text="Expenses: $0" Margin="0 10"/>
-                            <TextBlock x:Name="ShippingTextBlock" FontSize="16" Text="Shipping: $0" Margin="0 10"/>
-                            <TextBlock x:Name="FeesTextBlock" FontSize="16" Text="Fees: $0" Margin="0 10"/>
+                            <TextBlock x:Name="StageSummaryTextBlock" Text="Loading stage summary..." FontWeight="Bold" FontSize="14" Margin="10" TextWrapping="Wrap" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="TotalCostOfGoodsTextBlock" FontSize="16" Text="Total Cost Of Goods: $0.00" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="GrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="RevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="GrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="ReturnOnInventmentTextBlock" FontSize="16" Text="Return On Investment (ROI): 0%" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="AverageSalePriceTextBlock" FontSize="16" Text="Average Sale Price: $0" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="InventoryTurnoverRateTextBlock" FontSize="16" Text="Turnover Rate = 0 items" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="ExpensesTextBlock" FontSize="16" Text="Expenses: $0" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="ShippingTextBlock" FontSize="16" Text="Shipping: $0" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="FeesTextBlock" FontSize="16" Text="Fees: $0" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
                         </StackPanel>
                     </TabItem>
 <!--#endregion-->
                     
-<!--#region Inventory Tab -->
-                    <TabItem Header="Inventory">
-                        <Grid Margin="10">
+                    <!--#region Inventory Tab -->
+                    <TabItem Header="Inventory" Margin="20 0 -20 0">
+                        <Grid Margin="0 40 0 0" Style="{StaticResource FadeInGrid}" >
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -107,22 +285,22 @@
                                         <ComboBoxItem Content="Whatnot"/>
                                         <ComboBoxItem Content="Other"/>
                                     </ComboBox>
-                                    <TextBlock Text="Item Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                                    <TextBox x:Name="ItemNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
-                                    <TextBlock Text="Brand" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Item Name:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
+                                    <TextBox x:Name="ItemNameBox" Width="150" Margin="0 0 15 0" Height="20" />
+                                    <TextBlock Text="Brand" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="BrandNameBox" Width="150" Margin="0 0 15 0" Height="20"/>
-                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
-                                    <TextBox x:Name="PurchasePriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
-                                    <TextBlock Text="Selling Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
+                                    <TextBox x:Name="PurchasePriceBox" Width="100" Margin="0 0 15 0" Height="20" />
+                                    <TextBlock Text="Selling Price:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="SellingPriceBox" Width="100" Margin="0 0 15 0" Height="20"/>
                                 </WrapPanel>
 
                                 <WrapPanel>
-                                    <TextBlock Text="SKU:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="SKU:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="SkuBox" Width="120" Margin="0 0 15 0" Height="20"/>
-                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <DatePicker x:Name="DateBox" Width="150" Margin="0 0 15 0" Height="25"/>
-                                    <TextBlock Text="Tags:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Tags:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="TagsBox" Width="150" Margin="0 0 15 0" Height="20"/>
                                     <ComboBox x:Name="LifecycleComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Select Stage"/>
@@ -149,20 +327,20 @@
                                         <ComboBoxItem Content="Seller - UPS"/>
                                         <ComboBoxItem Content="Seller - FedEx"/>
                                     </ComboBox>
-                                    <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0"/>
+                                    <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="75 0 5 0"/>
-                                    <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30"/>
+                                    <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="10 0 5 0"/>
-                                    <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30"/>
+                                    <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="10 0 5 0"/>
-                                    <Button Content="Batch Add Items" Width="125" Margin="5" Click="QuickAddButton_Click" Height="30"/>
+                                    <Button Content="Batch Add Items" Width="125" Margin="5" Click="QuickAddButton_Click" Height="30" Style="{StaticResource HoverButtonStyle}"/>
                                 </WrapPanel>
 
                                 <!-- Inventory Filter -->
-                                <Popup x:Name="FilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=InventoryFilterButton}">
-                                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
-                                        <StackPanel>
-                                            <TextBlock Text="Filter by:" FontWeight="Bold"/>
+                                <Popup x:Name="FilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=InventoryFilterButton}" >
+                                    <Border BorderBrush="Gray" BorderThickness="1" Background="{DynamicResource BackgroundBrush}" Padding="10" Style="{StaticResource CardStyle}">
+                                        <StackPanel Background="{DynamicResource BackgroundBrush}">
+                                            <TextBlock Text="Filter by:" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <ComboBox x:Name="CategoryFilterComboBox" Width="200" ItemsSource="{Binding Categories}" SelectedIndex="0"/>
                                             <Separator Margin="0 0 0 5"/>
                                             <ComboBox x:Name="MarketplaceCategoryFilterComboBox" Width="200">
@@ -189,25 +367,25 @@
                                                 <ComboBoxItem Content="Pending"/>
                                             </ComboBox>
                                             <Separator Margin="0 0 0 5"/>
-                                            <TextBlock Text="Item Name:"/>
+                                            <TextBlock Text="Item Name:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="ItemNameFilterTextBox" Width="200" Margin="0 5"/>
-                                            <TextBlock Text="Min Purchase Price:"/>
+                                            <TextBlock Text="Min Purchase Price:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="MinPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                            <TextBlock Text="Max Purchase Price:"/>
+                                            <TextBlock Text="Max Purchase Price:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="MaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                            <TextBlock Text="Tags"/>
+                                            <TextBlock Text="Tags" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="TagsFilterTextBox" Width="200" Margin="0 5"/>
                                             <Separator Margin="0 0 0 5"/>
-                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ApplyFilterButton_Click"/>
-                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ResetFiltersButton_Click"/>
-                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
+                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ApplyFilterButton_Click" Style="{StaticResource HoverButtonStyle}"/>
+                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ResetFiltersButton_Click" Style="{StaticResource HoverButtonStyle}"/>
+                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                         </StackPanel>
                                     </Border>
                                 </Popup>
                             </StackPanel>
-
+                            
                             <!-- Inventory Table -->
-                            <DataGrid x:Name="InventoryTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="InventoryTable_CellEditEnding" CanUserAddRows="False">
+                            <DataGrid x:Name="InventoryTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="InventoryTable_CellEditEnding" CanUserAddRows="False" Background="{DynamicResource BackgroundBrush}">
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Setter Property="Background" Value="{Binding RowColor}" />
@@ -219,9 +397,9 @@
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Margin="5">
-                                                    <Button Content="View" Click="ViewFilesButton_Click" />
+                                                    <Button Content="View" Click="ViewFilesButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                                     <Separator Margin="0 0 5 0"/>
-                                                    <Button Content="Add" Click="AddFilesButton_Click" />
+                                                    <Button Content="Add" Click="AddFilesButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
@@ -332,7 +510,7 @@
                                     <DataGridTemplateColumn Header="Actions">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" />
+                                                <Button Content="Delete" Click="DeleteButton_Click" Tag="{Binding SKU, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource HoverButtonStyle}"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -343,8 +521,8 @@
 <!--#endregion-->
                     
 <!--#region Expenses Tab -->
-                    <TabItem Header="Expenses">
-                        <Grid Margin="10">
+                    <TabItem Header="Expenses" Margin="35 0 -35 0">
+                        <Grid Margin="0 40 0 0" Style="{StaticResource FadeInGrid}">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
@@ -353,40 +531,40 @@
                             <!-- Expenses Input Form -->
                             <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 0 0 10">
                                 <WrapPanel Margin="0 0 0 10">
-                                    <TextBlock Text="Expense Name:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Expense Name:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="ExpenseItemNameBox" Width="150" Margin="0 0 15 0"/>
-                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Purchase Price:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="ExpensePurchasePriceBox" Width="100" Margin="0 0 15 0"/>
                                 </WrapPanel>
 
                                 <WrapPanel>
-                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                    <TextBlock Text="Purchase Date:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <DatePicker x:Name="ExpenseDateBox" Width="150" Margin="0 0 15 0"/>
-                                    <Button Content="Add Expense" Click="AddExpenseButton_Click" Width="100" Margin="0 0 0 0"/>
-                                    <Button x:Name="ExpensesFilterButton" Content="Filter" Width="100" Click="ExpensesFilterButton_Click" Margin="550 0 0 0"/>
+                                    <Button Content="Add Expense" Click="AddExpenseButton_Click" Width="100" Margin="0 0 0 0" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button x:Name="ExpensesFilterButton" Content="Filter" Width="100" Click="ExpensesFilterButton_Click" Margin="550 0 0 0" Style="{StaticResource HoverButtonStyle}"/>
                                 </WrapPanel>
 
                                 <!-- Expenses Filter -->
                                 <Popup x:Name="ExpensesFilterPopup" IsOpen="False" Placement="Bottom" StaysOpen="False" HorizontalAlignment="Left" PlacementTarget="{Binding ElementName=ExpensesFilterButton}">
-                                    <Border BorderBrush="Gray" BorderThickness="1" Background="White" Padding="10">
-                                        <StackPanel>
-                                            <TextBlock Text="Filter by:" FontWeight="Bold"/>
-                                            <TextBlock Text="Item Name:"/>
+                                    <Border BorderBrush="Gray" BorderThickness="1" Background="{DynamicResource BackgroundBrush}" Padding="10" Style="{StaticResource CardStyle}">
+                                        <StackPanel Background="{DynamicResource BackgroundBrush}">
+                                            <TextBlock Text="Filter by:" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
+                                            <TextBlock Text="Item Name:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="ExpenseItemNameFilterTextBox" Width="200" Margin="0 5"/>
-                                            <TextBlock Text="Min Purchase Price:"/>
+                                            <TextBlock Text="Min Purchase Price:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="ExpenseMinPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                            <TextBlock Text="Max Purchase Price:"/>
+                                            <TextBlock Text="Max Purchase Price:" Foreground="{DynamicResource ForegroundBrush}"/>
                                             <TextBox x:Name="ExpenseMaxPurchasePriceTextBox" Width="200" Margin="0 5"/>
-                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ExpensesApplyFilterButton_Click"/>
-                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ExpensesResetFiltersButton_Click"/>
-                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click"/>
+                                            <Button Content="Apply Filters" Width="100" Height="30" Click="ExpensesApplyFilterButton_Click" Style="{StaticResource HoverButtonStyle}"/>
+                                            <Button Content="Reset Filters" Width="100" Margin="5" Click="ExpensesResetFiltersButton_Click" Style="{StaticResource HoverButtonStyle}"/>
+                                            <Button Content="Close" Width="100" Height="30" Click="CloseFilterPopupButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                         </StackPanel>
                                     </Border>
                                 </Popup>
                             </StackPanel>
 
                             <!-- Expense Table -->
-                            <DataGrid x:Name="ExpenseTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="ExpenseTable_CellEditEnding" CanUserAddRows="False">
+                            <DataGrid x:Name="ExpenseTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="ExpenseTable_CellEditEnding" CanUserAddRows="False" Background="{DynamicResource BackgroundBrush}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Expense Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
                                     <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
@@ -394,7 +572,7 @@
                                     <DataGridTemplateColumn Header="Actions">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Content="Delete" Click="DeleteExpenseButton_Click" Tag="{Binding ItemName}" />
+                                                <Button Content="Delete" Click="DeleteExpenseButton_Click" Tag="{Binding ItemName}" Style="{StaticResource HoverButtonStyle}"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -406,37 +584,37 @@
                     
 <!--#region Revenue Calculator -->
                     <!-- Revenue Calculator -->
-                    <TabItem Header="Revenue Calculator">
-                        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 5 0 10">
+                    <TabItem Header="Revenue Calculator" Margin="50 0 -50 0">
+                        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0 40 0 0">
                             <WrapPanel Margin="0 0 0 10">
-                                <TextBlock Text="Item Cost" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                <TextBlock Text="Item Cost" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                 <TextBox x:Name="ItemCostTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
-                                <TextBlock Text="Selling Price" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                                <TextBlock Text="Selling Price" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                 <TextBox x:Name="SellingPriceTextBox" Width="150" Margin="0 0 15 0" TextChanged="CalculatorField_TextChanged"/>
                             </WrapPanel>
 
-                            <TextBlock x:Name="CalcGrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10"/>
-                            <TextBlock x:Name="CalcRevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10"/>
-                            <TextBlock x:Name="CalcGrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10"/>
+                            <TextBlock x:Name="CalcGrossRevenueTextBlock" FontSize="16" Text="Gross Revenue: $0.00" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="CalcRevenueTextBlock" FontSize="16" Text="Revenue: $0.00" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
+                            <TextBlock x:Name="CalcGrossMarginTextBlock" FontSize="16" Text="Gross Margin: 0%" Margin="0 10" Foreground="{DynamicResource ForegroundBrush}"/>
                         </StackPanel>
                     </TabItem>
 <!--#endregion-->
                     
 <!--#region Reports Tab -->
-                    <TabItem Header="Reports">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <StackPanel Orientation="Vertical" Margin="10">
+                    <TabItem Header="Reports" Margin="65 0 -65 0">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0 40 0 0">
+                            <StackPanel Orientation="Vertical">
 
                                 <!-- Date Filters -->
-                                <TextBlock Text="From:" Margin="0 0 5 0"/>
+                                <TextBlock Text="From:" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                 <DatePicker x:Name="ReportStartDatePicker"/>
 
-                                <TextBlock Text="To:" Margin="10 0 5 0"/>
+                                <TextBlock Text="To:" Margin="10 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                 <DatePicker x:Name="ReportEndDatePicker"/>
 
                                 <StackPanel Orientation="Horizontal" Margin="0 10 0 10">
-                                    <Button Content="Apply Filter" Click="ApplyReportDateFilter_Click" Margin="0 0 10 0"/>
-                                    <Button Content="Reset Filter" Click="ResetDateFilter_Click"/>
+                                    <Button Content="Apply Filter" Click="ApplyReportDateFilter_Click" Margin="0 0 10 0" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Reset Filter" Click="ResetDateFilter_Click" Style="{StaticResource HoverButtonStyle}"/>
                                 </StackPanel>
 
                                 <!-- Chart -->
