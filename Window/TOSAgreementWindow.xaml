@@ -1,0 +1,21 @@
+﻿<Window x:Class="CSharpResaleBusinessTracker.TOSAgreementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Terms of Service Agreement"
+        Height="400" Width="600"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Terms of Service Agreement" FontSize="20" FontWeight="Bold" Margin="0 0 0 10"/>
+            <TextBlock TextWrapping="Wrap" Margin="0 0 0 10">
+                By clicking “I Accept,” you agree to the Terms of Service for using FlipTrackr. 
+                This software is intended for personal use only. Redistribution is strictly prohibited.
+            </TextBlock>
+            <Button Content="View Full Terms of Service" Width="200" Margin="0 0 0 10" Click="ViewTerms_Click"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="I Accept" Width="100" Margin="0 0 10 0" Click="Accept_Click"/>
+                <Button Content="Decline" Width="100" Click="Decline_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

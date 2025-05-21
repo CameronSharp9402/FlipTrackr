@@ -1,0 +1,21 @@
+﻿<Window x:Class="CSharpResaleBusinessTracker.InstructionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
+        mc:Ignorable="d"
+        Title="Instructions" Height="250" Width="500">
+    <ScrollViewer Margin="10">
+        <StackPanel>
+            <TextBlock Text="How to Use FlipTrackr" FontSize="20" FontWeight="Bold" Margin="0 0 0 10" HorizontalAlignment="Center"/>
+            <TextBlock Text="1. Use the Inventory tab to add and track your sourced items." Margin="0 0 0 5"/>
+            <TextBlock Text="2. Use the Expenses tab to add and track your expense items." Margin="0 0 0 5"/>
+            <TextBlock Text="3. Use the Dashboard to view profits, costs, ROI, and more over time." Margin="0 0 0 5"/>
+            <TextBlock Text="4. Add business-related expenses under the Expenses tab." Margin="0 0 0 5"/>
+            <TextBlock Text="5. Use the Reports tab for daily/monthly insights via charts." Margin="0 0 0 5"/>
+            <TextBlock Text="6. Use the Revenue Calculator to evaluate item profitability." Margin="0 0 0 5"/>
+            <TextBlock Text="7. Adjust app settings (currency, ROI threshold, theme) via the Settings tab."/>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

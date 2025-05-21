@@ -206,7 +206,6 @@
                 <!--#region File Tab -->
                 <MenuItem Header="_File" Foreground="{DynamicResource ForegroundBrush}">
                     <MenuItem Header="Save All" Click="SaveAll_Click" Background="{DynamicResource BackgroundBrush}"/>
-                    <Separator />
                     <MenuItem Header="Create Backup" Click="CreateBackup_Click" Background="{DynamicResource BackgroundBrush}"/>
                     <MenuItem Header="Restore Backup" Click="RestoreBackup_Click" Background="{DynamicResource BackgroundBrush}"/>
                     <MenuItem Header="Export Inventory to CSV" Click="ExportInventoryToCsv_Click" Background="{DynamicResource BackgroundBrush}"/>
@@ -216,7 +215,20 @@
 <!--#region Settings Tab -->
                 <MenuItem Header="Settings" Foreground="{DynamicResource ForegroundBrush}" Click="OpenSettings_Click"/>
                 <!--#endregion-->
+                
+<!--#region About Tab -->
+                <MenuItem Header="About" Foreground="{DynamicResource ForegroundBrush}" Click="About_Click"/>
+<!--#endregion-->
+
+<!--#region Help Tab -->
+                <MenuItem Header="Help" Foreground="{DynamicResource ForegroundBrush}">
+                    <MenuItem Header="Report Bug" Click="ReportBug_Click" Background="{DynamicResource BackgroundBrush}"/>
+                    <MenuItem Header="How to use FlipTrackr" Click="Instruction_Click" Background="{DynamicResource BackgroundBrush}"/>
+                    <MenuItem Header="Terms of Service" Click="TermsOfService_Click" Background="{DynamicResource BackgroundBrush}"/>
+                </MenuItem>
             </Menu>           
+<!--#endregion-->
+        
 <!--#endregion-->
             
 <!--#region Application Tabs-->

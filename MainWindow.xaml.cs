@@ -16,6 +16,7 @@ using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Wpf;
 using LiveCharts.Defaults;
+using System.Threading;
 
 namespace CSharpResaleBusinessTracker
 {
@@ -52,9 +53,29 @@ namespace CSharpResaleBusinessTracker
         {
             SQLitePCL.Batteries_V2.Init();
 
+            string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr");
+            string tosPath = Path.Combine(appDataPath, "tos.txt");
+
+            if (!File.Exists(tosPath) || File.ReadAllText(tosPath).Trim().ToLower() != "accepted")
+            {
+                var tosWindow = new TOSAgreementWindow();
+                bool? result = tosWindow.ShowDialog();
+
+                if (result != true || !tosWindow.Accepted)
+                {
+                    MessageBox.Show("You must accept the Terms of Service to use FlipTrackr.", "Agreement Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Application.Current.Shutdown();
+                    return;
+                }
+
+                // Save TOS acceptance
+                Directory.CreateDirectory(appDataPath);
+                File.WriteAllText(tosPath, "accepted");
+            }
+
             XValueFormatter = value => new DateTime((long)value).ToString("MM / dd / yyyy");
             DashboardLabels = new ObservableCollection<string>();
-            CurrencyFormatter = value => value.ToString("C2"); // $0.00
+            CurrencyFormatter = value => value.ToString("C", CultureInfo.CurrentCulture); // $0.00
             var rawSeriesList = new List<SeriesViewModel>
 {
                 new SeriesViewModel
@@ -163,6 +184,16 @@ namespace CSharpResaleBusinessTracker
             }
             inventory = new ObservableCollection<InventoryItem>(items);
             expense = new ObservableCollection<Expenses>(DatabaseHelper.LoadExpenseItems());
+
+            string cultureCode = Properties.Settings.Default.CurrencyCultureCode;
+            if (!string.IsNullOrEmpty(cultureCode))
+            {
+                var culture = new CultureInfo(cultureCode);
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
+                Thread.CurrentThread.CurrentCulture = culture;
+                Thread.CurrentThread.CurrentUICulture = culture;
+            }
 
             // Set item sources
             InventoryTable.ItemsSource = inventory;
@@ -1077,6 +1108,34 @@ namespace CSharpResaleBusinessTracker
             return input;
         }
 
+        private void About_Click(object sender, RoutedEventArgs e)
+        {
+            var aboutWindow = new AboutWindow();
+            aboutWindow.Owner = this;
+            aboutWindow.ShowDialog();
+        }
+
+        private void ReportBug_Click(object sender, RoutedEventArgs e)
+        {
+            var bugWindow = new ReportBugWindow();
+            bugWindow.Owner = this;
+            bugWindow.ShowDialog();
+        }
+
+        private void Instruction_Click(object sender, RoutedEventArgs e)
+        {
+            var instructionWindow = new InstructionWindow();
+            instructionWindow.Owner = this;
+            instructionWindow.ShowDialog();
+        }
+
+        private void TermsOfService_Click(object sender, RoutedEventArgs e)
+        {
+            var termsWindow = new TermsOfServiceWindow();
+            termsWindow.Owner = this;
+            termsWindow.ShowDialog();
+        }
+
         #endregion
 
         #endregion
@@ -1119,7 +1178,7 @@ namespace CSharpResaleBusinessTracker
             RevenueCalculator(); // Now safe to calculate
         }
 
-        private void RevenueCalculator()
+        public void RevenueCalculator()
         {
             bool isCostValid = double.TryParse(ItemCostTextBox.Text, out double cost);
             bool isSellingPriceValid = double.TryParse(SellingPriceTextBox.Text, out double sellingPrice);
@@ -1138,8 +1197,8 @@ namespace CSharpResaleBusinessTracker
             else
             {
                 // If one or both fields are empty, show blanks but NO crash
-                SetTextBlock(CalcRevenueTextBlock, "Revenue: $0.00");
-                SetTextBlock(CalcGrossRevenueTextBlock, "Gross Revenue: $0.00");
+                SetTextBlock(CalcRevenueTextBlock, $"Revenue: {0.0.ToString("C", CultureInfo.CurrentCulture)}");
+                SetTextBlock(CalcGrossRevenueTextBlock, $"Gross Revenue: {0.0.ToString("C", CultureInfo.CurrentCulture)}");
                 SetTextBlock(CalcGrossMarginTextBlock, "Gross Margin: 0%");
             }
         }

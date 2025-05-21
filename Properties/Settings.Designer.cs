@@ -22,5 +22,29 @@ namespace CSharpResaleBusinessTracker.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
+        public string CurrencyCultureCode {
+            get {
+                return ((string)(this["CurrencyCultureCode"]));
+            }
+            set {
+                this["CurrencyCultureCode"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TOSAccepted {
+            get {
+                return ((bool)(this["TOSAccepted"]));
+            }
+            set {
+                this["TOSAccepted"] = value;
+            }
+        }
     }
 }

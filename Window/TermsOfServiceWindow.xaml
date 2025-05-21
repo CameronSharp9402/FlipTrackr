@@ -1,0 +1,63 @@
+﻿<Window x:Class="CSharpResaleBusinessTracker.TermsOfServiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Terms of Service" Height="650" Width="800" ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="10">
+        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="8" Padding="15" Background="White">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="Terms of Service for FlipTrackr" FontSize="22" FontWeight="Bold" Margin="0 0 0 10"/>
+                    <TextBlock Text="Last Updated: May 21, 2025" FontStyle="Italic" Margin="0 0 0 20"/>
+
+                    <TextBlock Text="1. Use of the Application" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        FlipTrackr is provided solely for personal use. You may use the Application only for lawful purposes and in accordance with these Terms.
+                        You agree not to:  
+                    </TextBlock>
+                    <TextBlock Text="• Reverse engineer, decompile, or modify the Application."/>
+                    <TextBlock Text="• Sell, sublicense, distribute, or exploit the Application commercially."/>
+                    <TextBlock Text="• Use the Application in violation of any applicable law or regulation."/>
+
+                    <TextBlock Text="2. Ownership and Intellectual Property" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        All content and features of FlipTrackr are the exclusive property of the Developer. You are granted a limited, non-exclusive, non-transferable, revocable license to use the Application for personal purposes only.
+                    </TextBlock>
+
+                    <TextBlock Text="3. Data Storage and Privacy" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        FlipTrackr stores all data locally on your device. No data is transmitted externally by the Developer. You are responsible for managing your own data backups.
+                    </TextBlock>
+
+                    <TextBlock Text="4. Limitation of Liability" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        The Application is provided “as is” with no warranties. The Developer is not liable for indirect, incidental, or consequential damages, including data loss or business interruption.
+                    </TextBlock>
+
+                    <TextBlock Text="5. Modifications and Updates" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        The Developer reserves the right to update, modify, or discontinue the Application at any time without notice. Continued use after updates indicates your acceptance of the changes.
+                    </TextBlock>
+
+                    <TextBlock Text="6. Termination" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        We may terminate your access to the Application at any time if you violate these Terms.
+                    </TextBlock>
+
+                    <TextBlock Text="7. No Redistribution" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        Redistribution, resale, or public sharing of FlipTrackr is strictly prohibited. Unauthorized distribution may result in legal action.
+                    </TextBlock>
+
+                    <TextBlock Text="8. Contact Information" FontWeight="Bold" FontSize="16" Margin="0 10 0 2"/>
+                    <TextBlock TextWrapping="Wrap">
+                        For questions, support, or bug reports, please contact:
+                        Email: CameronSharp9402@aol.com
+                    </TextBlock>
+                    <TextBlock Text="GitHub: https://github.com/CameronSharp9402"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>
+

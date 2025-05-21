@@ -1,0 +1,16 @@
+﻿<Window x:Class="CSharpResaleBusinessTracker.ReportBugWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CSharpResaleBusinessTracker"
+        mc:Ignorable="d"
+        Title="Report a Bug" Height="400" Width="500">
+    <Grid>
+        <StackPanel>
+            <TextBlock Text="Describe the issue you're experiencing:" FontWeight="Bold" Margin="0 0 0 10"/>
+            <TextBox x:Name="BugDescriptionTextBox" AcceptsReturn="True" Height="200" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+            <Button Content="Submit Report" Margin="0 10 0 0" Click="SubmitBugReport_Click" HorizontalAlignment="Right" Width="120"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,7 +1,7 @@
 ﻿<Window x:Class="CSharpResaleBusinessTracker.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Settings" Height="200" Width="300">
+        Title="Settings" Height="300" Width="300">
 
     <Window.Resources>
         
@@ -73,6 +73,17 @@
         <Separator Margin="0 0 0 25" />
         <TextBlock Text="ROI Threshold (%)" Margin="0 0 0 10" HorizontalAlignment="Center" Foreground="{DynamicResource ForegroundBrush}"/>
         <TextBox x:Name="RoiThreshold" Width="100" Margin="0 0 0 10"/>
+        <Separator Margin="10"/>
+        <TextBlock Text="Select Currency:" HorizontalAlignment="Center" FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
+        <ComboBox x:Name="CurrencyComboBox" Width="200" Margin="10" SelectionChanged="CurrencyComboBox_SelectionChanged">
+            <ComboBoxItem Content="USD" Tag="en-US" />
+            <ComboBoxItem Content="EUR" Tag="fr-FR" />
+            <ComboBoxItem Content="GBP" Tag="en-GB" />
+            <ComboBoxItem Content="JPY" Tag="ja-JP" />
+            <ComboBoxItem Content="CAD" Tag="en-CA" />
+            <ComboBoxItem Content="AUD" Tag="en-AU" />
+        </ComboBox>
+        <Separator Margin="10"/>
         <Button Content="Save Changes" Click="SaveButton_Click" Style="{StaticResource HoverButtonStyle}"/>
         <Button Content="Toggle Dark Mode" Click="ToggleDarkMode_Click" Width="150" Margin="10" Style="{StaticResource HoverButtonStyle}"/>
     </StackPanel>
