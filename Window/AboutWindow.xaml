@@ -12,10 +12,10 @@
             <TextBlock Text="FlipTrackr" FontSize="24" FontWeight="Bold" TextAlignment="Center" Margin="0,0,0,5"/>
             <TextBlock Text="Version 1.0.0" FontSize="14" Foreground="Gray" TextAlignment="Center" Margin="0,0,0,20"/>
 
-            <TextBlock Text="FlipTrackr is a powerful inventory and profit tracking tool built specifically for online resellers. Track inventory, expenses, revenue, ROI, and generate insights through modern charts and dashboards." 
+            <TextBlock Text="FlipTrackr is a powerful inventory and profit tracking tool built specifically for online resellers. Track inventory, expenses, revenue, ROI, etc, and generate insights through modern charts and dashboards." 
                        TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20"/>
 
-            <TextBlock Text="Developed by Cameron — a passionate computer science student and full-time reseller who enjoys building tools that solve real problems." 
+            <TextBlock Text="Developed by Cameron - a passionate computer science student and full-time reseller who enjoys building tools that solve real problems." 
                        TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20"/>
 
             <TextBlock Text="GitHub:" FontWeight="Bold" Margin="0,0,0,5"/>
@@ -24,6 +24,12 @@
                     https://github.com/CameronSharp9402
                 </Hyperlink>
             </TextBlock>
+            <Button Content="Support my work"
+            Margin="0 15"
+            Padding="10 5"
+            Cursor="Hand"
+            HorizontalAlignment="Center"
+            Click="KoFiButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
