@@ -314,7 +314,7 @@
                                     <DatePicker x:Name="DateBox" Width="150" Margin="0 0 15 0" Height="25"/>
                                     <TextBlock Text="Tags:" VerticalAlignment="Center" Margin="0 0 5 0" Foreground="{DynamicResource ForegroundBrush}"/>
                                     <TextBox x:Name="TagsBox" Width="150" Margin="0 0 15 0" Height="20"/>
-                                    <ComboBox x:Name="LifecycleComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
+                                    <ComboBox x:Name="LifecycleComboBox" VerticalAlignment="Center"  Width="125" Margin="5 0 10 0" ItemsSource="{Binding LifecycleIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Select Stage"/>
                                         <ComboBoxItem Content="Sourced"/>
                                         <ComboBoxItem Content="Listed"/>
@@ -322,7 +322,7 @@
                                         <ComboBoxItem Content="Returned"/>
                                         <ComboBoxItem Content="Other"/>
                                     </ComboBox>
-                                    <ComboBox x:Name="ItemConditionComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ItemConditionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
+                                    <ComboBox x:Name="ItemConditionComboBox" VerticalAlignment="Center" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ItemConditionIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Item Condition"/>
                                         <ComboBoxItem Content="New"/>
                                         <ComboBoxItem Content="Like New"/>
@@ -330,7 +330,7 @@
                                         <ComboBoxItem Content="Fair"/>
                                         <ComboBoxItem Content="Poor"/>
                                     </ComboBox>
-                                    <ComboBox x:Name="ShippingMethodComboBox" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ShippingMethodIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
+                                    <ComboBox x:Name="ShippingMethodComboBox" VerticalAlignment="Center" Width="125" Margin="5 0 10 0" ItemsSource="{Binding ShippingMethodIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedIndex="0">
                                         <ComboBoxItem Content="Shipping Method"/>
                                         <ComboBoxItem Content="Buyer - USPS"/>
                                         <ComboBoxItem Content="Buyer - UPS"/>
@@ -341,7 +341,7 @@
                                     </ComboBox>
                                     <Button Content="Add Item" Click="AddSaleButton_Click" Width="100" Margin="0 0 0 0" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="75 0 5 0"/>
-                                    <Button Content="Manage Categories" Click="ManageCategories_Click" Height="30" Style="{StaticResource HoverButtonStyle}"/>
+                                    <Button Content="Manage Categories" Click="ManageCategories_Click" Width="125" Height="30" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="10 0 5 0"/>
                                     <Button x:Name="InventoryFilterButton" Content="Filter" Width="100" Click="InventoryFilterButton_Click" Height="30" Style="{StaticResource HoverButtonStyle}"/>
                                     <Separator Margin="10 0 5 0"/>
@@ -409,7 +409,7 @@
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Margin="5">
-                                                    <Button Content="View" Click="ViewFilesButton_Click" Style="{StaticResource HoverButtonStyle}"/>
+                                                    <Button Content="View" Width="40" Click="ViewFilesButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                                     <Separator Margin="0 0 5 0"/>
                                                     <Button Content="Add" Click="AddFilesButton_Click" Style="{StaticResource HoverButtonStyle}"/>
                                                 </StackPanel>
@@ -577,6 +577,12 @@
 
                             <!-- Expense Table -->
                             <DataGrid x:Name="ExpenseTable" Grid.Row="1" AutoGenerateColumns="False" CellEditEnding="ExpenseTable_CellEditEnding" CanUserAddRows="False" Background="{DynamicResource BackgroundBrush}">
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Background" Value="{DynamicResource BackgroundBrush}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+                                    </Style>
+                                </DataGrid.RowStyle>
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Expense Name" Binding="{Binding ItemName, UpdateSourceTrigger=PropertyChanged}" />
                                     <DataGridTextColumn Header="Purchase Price" Binding="{Binding PurchasePrice, UpdateSourceTrigger=PropertyChanged}" />
