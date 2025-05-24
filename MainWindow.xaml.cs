@@ -507,7 +507,6 @@ namespace CSharpResaleBusinessTracker
                            (!reportFilterEndDate.HasValue || parsedDate <= reportFilterEndDate))
                 .GroupBy(i => DateTime.Parse(i.DatePurchased).Date)
                 .OrderBy(g => g.Key);
-
             foreach (var group in groupedByDate)
             {
                 DateTime date = group.Key;
@@ -524,6 +523,18 @@ namespace CSharpResaleBusinessTracker
                 DashboardSeries[2].Values.Add(new DateTimePoint(date, Math.Round(profit, 2)));
                 DashboardSeries[3].Values.Add(new DateTimePoint(date, Math.Round(shipping, 2)));
                 DashboardSeries[4].Values.Add(new DateTimePoint(date, Math.Round(fees, 2)));
+
+                // ⚠️ Check for single data point case
+                if (groupedByDate.Count() == 1)
+                {
+                    var extraDate = date.AddDays(1); // +1 day just for padding
+                    DashboardLabels.Add(extraDate.ToString("MMM dd"));
+                    DashboardSeries[0].Values.Add(new DateTimePoint(extraDate, 0));
+                    DashboardSeries[1].Values.Add(new DateTimePoint(extraDate, 0));
+                    DashboardSeries[2].Values.Add(new DateTimePoint(extraDate, 0));
+                    DashboardSeries[3].Values.Add(new DateTimePoint(extraDate, 0));
+                    DashboardSeries[4].Values.Add(new DateTimePoint(extraDate, 0));
+                }
             }
 
             foreach (var series in DashboardSeries)
