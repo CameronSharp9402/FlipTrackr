@@ -63,7 +63,8 @@ namespace CSharpResaleBusinessTracker
                 ItemNotes TEXT,
                 AttachmentPaths TEXT,
                 Shipping INTEGER,
-                Fees INTEGER
+                Fees INTEGER,
+                SaleBreakdownShown INTEGER DEFAULT 0
             );
             ";
                 createInventoryTableCmd.ExecuteNonQuery();
@@ -215,7 +216,7 @@ namespace CSharpResaleBusinessTracker
             {
                 connection.Open();
                 var command = connection.CreateCommand();
-                command.CommandText = "SELECT Id, ItemName, Brand, Category, Marketplace, Description, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemCondition, ShippingMethod, ItemNotes, AttachmentPaths, Shipping, Fees FROM Inventory;";
+                command.CommandText = "SELECT Id, ItemName, Brand, Category, Marketplace, Description, PurchasePrice, SellingPrice, DatePurchased, SKU, IsSold, Tags, Stage, ItemCondition, ShippingMethod, ItemNotes, AttachmentPaths, Shipping, Fees, SaleBreakdownShown FROM Inventory;";
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -241,6 +242,7 @@ namespace CSharpResaleBusinessTracker
                               AttachmentPaths = reader.IsDBNull(16) ? null : reader.GetString(16),
                               Shipping = reader.GetDouble(17),
                               Fees = reader.GetDouble(18),
+                              SaleBreakdownShown = reader.IsDBNull(19) ? false : reader.GetInt32(19) == 1,
                           });
                     }
                 }
@@ -345,7 +347,8 @@ namespace CSharpResaleBusinessTracker
                     ItemNotes = $itemNotes,
                     AttachmentPaths = $attachmentPaths,
                     Shipping = $shipping,
-                    Fees = $fees
+                    Fees = $fees,
+                    SaleBreakdownShown = $saleBreakdownShown
                 WHERE Id = $id;
                 ";
                 command.Parameters.AddWithValue("$itemname", item.ItemName);
@@ -366,6 +369,7 @@ namespace CSharpResaleBusinessTracker
                 command.Parameters.AddWithValue("$attachmentPaths", item.AttachmentPaths ?? string.Empty);
                 command.Parameters.AddWithValue("$shipping", item.Shipping);
                 command.Parameters.AddWithValue("$fees", item.Fees);
+                command.Parameters.AddWithValue("$saleBreakdownShown", item.SaleBreakdownShown ? 1 : 0);
                 command.Parameters.AddWithValue("$id", item.Id);
                 command.ExecuteNonQuery();
             }

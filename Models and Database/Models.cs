@@ -14,6 +14,7 @@ namespace CSharpResaleBusinessTracker
     public class InventoryItem : INotifyPropertyChanged
     {
         public int Id { get; set; }
+        public bool SaleBreakdownShown { get; set; } = false;
         private bool isSold;
         private string category;
         private string itemName;

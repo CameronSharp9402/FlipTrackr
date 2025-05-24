@@ -358,16 +358,89 @@ namespace CSharpResaleBusinessTracker
 
         private void LifecycleTableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var comboBox = (ComboBox)sender;
-            var selectedItem = (InventoryItem)comboBox.DataContext;
-
-            if (selectedItem != null && comboBox.SelectedIndex >= 0)
+            if (sender is ComboBox comboBox && comboBox.DataContext is InventoryItem selectedItem)
             {
-                selectedItem.LifecycleIndex = comboBox.SelectedIndex;
-                DatabaseHelper.UpdateInventoryItem(selectedItem); // Assuming this saves to DB
-                UpdateDashboard(); // <-- Trigger immediate UI update
+                int originalIndex = selectedItem.LifecycleIndex;
+                int newIndex = comboBox.SelectedIndex;
+
+                // === If not switching to Sold (3)
+                if (newIndex != 3)
+                {
+                    if (selectedItem.SaleBreakdownShown || selectedItem.IsSold)
+                    {
+                        selectedItem.SaleBreakdownShown = false;
+                        selectedItem.IsSold = false;
+                    }
+
+                    selectedItem.LifecycleIndex = newIndex;
+                    DatabaseHelper.UpdateInventoryItem(selectedItem);
+                    UpdateDashboard();
+                    return;
+                }
+
+                // === Validate required fields before switching to Sold
+                if (selectedItem.PurchasePrice <= 0 ||
+                    selectedItem.SellingPrice <= 0 ||
+                    !WasFieldEdited(selectedItem.Shipping) ||
+                    !WasFieldEdited(selectedItem.Fees))
+                {
+                    MessageBox.Show("Please fill in Purchase Price, Selling Price, Shipping, and Fees before marking as Sold.", "Missing Data", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                    // === Revert to original index manually
+                    comboBox.SelectionChanged -= LifecycleTableComboBox_SelectionChanged;
+
+                    if (originalIndex == 1)
+                    {
+                        comboBox.SelectedIndex = 1;
+                        selectedItem.LifecycleIndex = 1;
+                    }
+                    else if (originalIndex == 2)
+                    {
+                        comboBox.SelectedIndex = 2;
+                        selectedItem.LifecycleIndex = 2;
+                    }
+                    else if (originalIndex == 4)
+                    {
+                        comboBox.SelectedIndex = 4;
+                        selectedItem.LifecycleIndex = 4;
+                    }
+                    else if (originalIndex == 5)
+                    {
+                        comboBox.SelectedIndex = 5;
+                        selectedItem.LifecycleIndex = 5;
+                    }
+                    else
+                    {
+                        comboBox.SelectedIndex = 0;
+                        selectedItem.LifecycleIndex = 0;
+                    }
+
+                    comboBox.SelectionChanged += LifecycleTableComboBox_SelectionChanged;
+                    return;
+                }
+
+                // === Show popup only once
+                if (!selectedItem.SaleBreakdownShown)
+                {
+                    var popup = new SaleBreakdownWindow(selectedItem);
+                    popup.ShowDialog();
+
+                    selectedItem.SaleBreakdownShown = true;
+                    selectedItem.IsSold = true;
+                }
+
+                selectedItem.LifecycleIndex = newIndex;
+                DatabaseHelper.UpdateInventoryItem(selectedItem);
+                UpdateDashboard();
             }
         }
+
+        private bool WasFieldEdited(double value)
+        {
+            return value > 0;
+        }
+
+
         private void ItemConditionComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = (ComboBox)sender;
@@ -376,7 +449,7 @@ namespace CSharpResaleBusinessTracker
             if (selectedItem != null && comboBox.SelectedIndex >= 0)
             {
                 selectedItem.ItemConditionIndex = comboBox.SelectedIndex;
-                DatabaseHelper.UpdateInventoryItem(selectedItem); // Assuming this saves to DB
+                DatabaseHelper.UpdateInventoryItem(selectedItem); 
             }
         }
         private void ShippingMethodComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -387,7 +460,7 @@ namespace CSharpResaleBusinessTracker
             if (selectedItem != null && comboBox.SelectedIndex >= 0)
             {
                 selectedItem.ShippingMethodIndex = comboBox.SelectedIndex;
-                DatabaseHelper.UpdateInventoryItem(selectedItem); // Assuming this saves to DB
+                DatabaseHelper.UpdateInventoryItem(selectedItem); 
             }
         }
         public void UpdateRoiThreshold(double newThreshold)
@@ -402,6 +475,16 @@ namespace CSharpResaleBusinessTracker
             // Immediately update
             UpdateDashboard();
         }
+        private bool IsInventoryItemComplete(InventoryItem item)
+        {
+            return !string.IsNullOrWhiteSpace(item.ItemName) &&
+                   item.PurchasePrice > 0 &&
+                   item.SellingPrice > 0 &&
+                   !string.IsNullOrWhiteSpace(item.SKU) &&
+                   !string.IsNullOrWhiteSpace(item.DatePurchased) &&
+                   item.LifecycleIndex == 3; // Sold
+        }
+
 
         #endregion
 
