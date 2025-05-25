@@ -475,16 +475,6 @@ namespace CSharpResaleBusinessTracker
             // Immediately update
             UpdateDashboard();
         }
-        private bool IsInventoryItemComplete(InventoryItem item)
-        {
-            return !string.IsNullOrWhiteSpace(item.ItemName) &&
-                   item.PurchasePrice > 0 &&
-                   item.SellingPrice > 0 &&
-                   !string.IsNullOrWhiteSpace(item.SKU) &&
-                   !string.IsNullOrWhiteSpace(item.DatePurchased) &&
-                   item.LifecycleIndex == 3; // Sold
-        }
-
 
         #endregion
 
