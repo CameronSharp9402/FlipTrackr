@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Sensitive Avalonia Information (DO NOT INCLUDE IN PUBLIC REPOSITORY!!!)
+FlipTrackr.csproj
+NuGet.config
