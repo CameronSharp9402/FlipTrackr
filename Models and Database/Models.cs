@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Windows;
 
 namespace CSharpResaleBusinessTracker
 {
@@ -135,6 +138,43 @@ namespace CSharpResaleBusinessTracker
                     OnPropertyChanged(nameof(Shipping));
                 }
             }
+        }
+        public BitmapImage ThumbnailImage
+        {
+            get
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(AttachmentPaths))
+                    {
+                        string firstFile = AttachmentPaths.Split(';').FirstOrDefault(); // Assuming semicolon-delimited
+                        if (IsImageFile(firstFile) && File.Exists(firstFile))
+                        {
+                            return new BitmapImage(new Uri(firstFile));
+                        }
+                    }
+                }
+                catch { }
+
+                return null;
+            }
+        }
+        public Visibility IsNotImageVisible
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(AttachmentPaths)) return Visibility.Visible;
+
+                string firstFile = AttachmentPaths.Split(';').FirstOrDefault();
+                return IsImageFile(firstFile) ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+        private bool IsImageFile(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+
+            var ext = Path.GetExtension(path)?.ToLower();
+            return ext is ".png" or ".jpg" or ".jpeg" or ".bmp" or ".gif";
         }
 
         public string AttachmentPaths

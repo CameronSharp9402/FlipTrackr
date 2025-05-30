@@ -17,6 +17,7 @@ using LiveCharts;
 using LiveCharts.Wpf;
 using LiveCharts.Defaults;
 using System.Threading;
+using FlipTrackr.Handlers;
 
 namespace CSharpResaleBusinessTracker
 {
@@ -39,7 +40,7 @@ namespace CSharpResaleBusinessTracker
 
         private readonly string AppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"FlipTrackr");
 
-        public ObservableCollection<SeriesViewModel> DashboardSeriesViewModels { get; set; } = new ObservableCollection<SeriesViewModel>();
+        public ObservableCollection<FlipTrackr.Handlers.SeriesViewModel> DashboardSeriesViewModels { get; set; } = new ObservableCollection<FlipTrackr.Handlers.SeriesViewModel>();
         public SeriesCollection DashboardSeries { get; set; } = new SeriesCollection();
         public ObservableCollection<string> DashboardLabels { get; set; } = new ObservableCollection<string>();
         public Func<double, string> XValueFormatter { get; set; }
@@ -52,6 +53,11 @@ namespace CSharpResaleBusinessTracker
         public MainWindow()
         {
             SQLitePCL.Batteries_V2.Init();
+
+            SettingsManager.LoadSettings();
+            var culture = new CultureInfo(SettingsManager.CurrentSettings.CurrencyCultureCode);
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
             string appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FlipTrackr");
             string tosPath = Path.Combine(appDataPath, "tos.txt");
@@ -76,9 +82,9 @@ namespace CSharpResaleBusinessTracker
             XValueFormatter = value => new DateTime((long)value).ToString("MM / dd / yyyy");
             DashboardLabels = new ObservableCollection<string>();
             CurrencyFormatter = value => value.ToString("C", CultureInfo.CurrentCulture); // $0.00
-            var rawSeriesList = new List<SeriesViewModel>
+            var rawSeriesList = new List<FlipTrackr.Handlers.SeriesViewModel>
 {
-                new SeriesViewModel
+                new FlipTrackr.Handlers.SeriesViewModel
                 {
                     Title = "Revenue",
                     Series = new LineSeries
@@ -90,7 +96,7 @@ namespace CSharpResaleBusinessTracker
                         Stroke = Brushes.SteelBlue
                     }
                 },
-                new SeriesViewModel
+                new FlipTrackr.Handlers.SeriesViewModel
                 {
                     Title = "Cost",
                     Series = new LineSeries
@@ -102,7 +108,7 @@ namespace CSharpResaleBusinessTracker
                         Stroke = Brushes.IndianRed
                     }
                 },
-                new SeriesViewModel
+                new FlipTrackr.Handlers.SeriesViewModel
                 {
                     Title = "Profit",
                     Series = new LineSeries
@@ -114,7 +120,7 @@ namespace CSharpResaleBusinessTracker
                         Stroke = Brushes.DarkGreen
                     }
                 },
-                new SeriesViewModel
+                new FlipTrackr.Handlers.SeriesViewModel
                 {
                     Title = "Shipping",
                     Series = new LineSeries
@@ -126,7 +132,7 @@ namespace CSharpResaleBusinessTracker
                         Stroke = Brushes.MediumPurple
                     }
                 },
-                new SeriesViewModel
+                new FlipTrackr.Handlers.SeriesViewModel
                 {
                     Title = "Fees",
                     Series = new LineSeries
@@ -184,16 +190,6 @@ namespace CSharpResaleBusinessTracker
             }
             inventory = new ObservableCollection<InventoryItem>(items);
             expense = new ObservableCollection<Expenses>(DatabaseHelper.LoadExpenseItems());
-
-            string cultureCode = Properties.Settings.Default.CurrencyCultureCode;
-            if (!string.IsNullOrEmpty(cultureCode))
-            {
-                var culture = new CultureInfo(cultureCode);
-                CultureInfo.DefaultThreadCurrentCulture = culture;
-                CultureInfo.DefaultThreadCurrentUICulture = culture;
-                Thread.CurrentThread.CurrentCulture = culture;
-                Thread.CurrentThread.CurrentUICulture = culture;
-            }
 
             // Set item sources
             InventoryTable.ItemsSource = inventory;
@@ -828,7 +824,7 @@ namespace CSharpResaleBusinessTracker
         private void DashboardFilterButton_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
-            string tag = button?.Tag?.ToString();
+            string? tag = button?.Tag?.ToString();
 
             DateTime now = DateTime.Now;
             switch (tag)
@@ -882,8 +878,8 @@ namespace CSharpResaleBusinessTracker
 
         private void ApplyFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            string itemNameFilter = ItemNameFilterTextBox.Text?.Trim().ToLower();
-            string itemTagFilter = TagsFilterTextBox.Text?.Trim().ToLower();
+            string? itemNameFilter = ItemNameFilterTextBox.Text?.Trim().ToLower();
+            string? itemTagFilter = TagsFilterTextBox.Text?.Trim().ToLower();
             double minPrice = 0, maxPrice = double.MaxValue;
 
             if (double.TryParse(MinPurchasePriceTextBox.Text, out var min))
@@ -911,7 +907,7 @@ namespace CSharpResaleBusinessTracker
 
         private void ExpensesApplyFilterButton_Click(object sender, RoutedEventArgs e)
         {
-            string itemNameFilter = ExpenseItemNameFilterTextBox.Text?.Trim().ToLower();
+            string? itemNameFilter = ExpenseItemNameFilterTextBox.Text?.Trim().ToLower();
             double minPrice = 0, maxPrice = double.MaxValue;
 
             if (double.TryParse(ExpenseMinPurchasePriceTextBox.Text, out var min))
@@ -1052,7 +1048,7 @@ namespace CSharpResaleBusinessTracker
         private void LegendItem_Click(object sender, MouseButtonEventArgs e)
         {
             var textBlock = sender as TextBlock;
-            var viewModel = textBlock?.DataContext as SeriesViewModel;
+            var viewModel = textBlock?.DataContext as FlipTrackr.Handlers.SeriesViewModel;
 
             if (viewModel != null)
             {

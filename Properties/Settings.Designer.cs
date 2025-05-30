@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CSharpResaleBusinessTracker.Properties {
+namespace FlipTrackr.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -20,18 +20,6 @@ namespace CSharpResaleBusinessTracker.Properties {
         public static Settings Default {
             get {
                 return defaultInstance;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("en-US")]
-        public string CurrencyCultureCode {
-            get {
-                return ((string)(this["CurrencyCultureCode"]));
-            }
-            set {
-                this["CurrencyCultureCode"] = value;
             }
         }
         

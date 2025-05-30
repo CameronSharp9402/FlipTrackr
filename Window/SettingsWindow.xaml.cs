@@ -1,50 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FlipTrackr.Handlers;
+using System;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Globalization;
-using System.Threading;
 
 namespace CSharpResaleBusinessTracker
 {
     public partial class SettingsWindow : Window
     {
-        private readonly string themeSettingsPath = System.IO.Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "FlipTrackr", "theme.txt");
-        public double Threshold { get; private set; }
+        private readonly string themeSettingsPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "FlipTrackr", "theme.txt");
 
         private string selectedCultureCode = "en-US";
+        public double Threshold { get; private set; }
+
         public SettingsWindow(double currentThreshold)
         {
             InitializeComponent();
             Threshold = currentThreshold;
             LoadSettings();
 
-            // Load from settings file (adjust this if you're using a different persistence approach)
-            string savedCulture = Properties.Settings.Default.CurrencyCultureCode;
-            if (!string.IsNullOrEmpty(savedCulture))
-            {
-                selectedCultureCode = savedCulture;
+            // Load and apply saved culture
+            selectedCultureCode = SettingsManager.CurrentSettings.CurrencyCultureCode;
 
-                // Select the matching ComboBoxItem
-                foreach (ComboBoxItem item in CurrencyComboBox.Items)
+            foreach (ComboBoxItem item in CurrencyComboBox.Items)
+            {
+                if (item.Tag?.ToString() == selectedCultureCode)
                 {
-                    if (item.Tag.ToString() == selectedCultureCode)
-                    {
-                        CurrencyComboBox.SelectedItem = item;
-                        break;
-                    }
+                    CurrencyComboBox.SelectedItem = item;
+                    break;
                 }
             }
         }
@@ -57,9 +44,9 @@ namespace CSharpResaleBusinessTracker
                 {
                     mainWindow.UpdateRoiThreshold(newThreshold);
 
-                    // Save the selected culture
-                    Properties.Settings.Default.CurrencyCultureCode = selectedCultureCode;
-                    Properties.Settings.Default.Save();
+                    // Update and save selected culture
+                    SettingsManager.CurrentSettings.CurrencyCultureCode = selectedCultureCode;
+                    SettingsManager.SaveSettings();
 
                     // Apply culture immediately
                     var culture = new CultureInfo(selectedCultureCode);
@@ -68,7 +55,6 @@ namespace CSharpResaleBusinessTracker
                     Thread.CurrentThread.CurrentCulture = culture;
                     Thread.CurrentThread.CurrentUICulture = culture;
 
-                    // Force UI to refresh with new formatting
                     mainWindow.UpdateDashboard();
                     mainWindow.RevenueCalculator();
 
@@ -76,8 +62,8 @@ namespace CSharpResaleBusinessTracker
                 }
 
                 Threshold = newThreshold;
-                this.DialogResult = true;
-                this.Close();
+                DialogResult = true;
+                Close();
             }
             else
             {
@@ -89,18 +75,14 @@ namespace CSharpResaleBusinessTracker
         {
             RoiThreshold.Text = Threshold.ToString("F2");
 
-            string savedCulture = Properties.Settings.Default.CurrencyCultureCode;
-            if (!string.IsNullOrEmpty(savedCulture))
-            {
-                selectedCultureCode = savedCulture;
+            selectedCultureCode = SettingsManager.CurrentSettings.CurrencyCultureCode;
 
-                foreach (ComboBoxItem item in CurrencyComboBox.Items)
+            foreach (ComboBoxItem item in CurrencyComboBox.Items)
+            {
+                if (item.Tag?.ToString() == selectedCultureCode)
                 {
-                    if (item.Tag?.ToString() == selectedCultureCode)
-                    {
-                        CurrencyComboBox.SelectedItem = item;
-                        break;
-                    }
+                    CurrencyComboBox.SelectedItem = item;
+                    break;
                 }
             }
         }
@@ -128,8 +110,9 @@ namespace CSharpResaleBusinessTracker
             if (File.Exists(themeSettingsPath))
                 return File.ReadAllText(themeSettingsPath).Trim();
 
-            return "Light"; // default
+            return "Light"; // Default
         }
+
         private void CurrencyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (CurrencyComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag != null)

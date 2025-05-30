@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FlipTrackr.Handlers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -21,12 +22,19 @@ namespace CSharpResaleBusinessTracker
     public partial class AttachmentViewerWindow : Window
     {
         private readonly InventoryItem selectedItem;
-        private readonly ObservableCollection<FileInfo> attachments;
+        private readonly ObservableCollection<AttachmentViewModel> attachments;
+
         public AttachmentViewerWindow(List<string> filePaths, InventoryItem item)
         {
             InitializeComponent();
             selectedItem = item;
-            attachments = new ObservableCollection<FileInfo>(filePaths.Where(File.Exists).Select(p => new FileInfo(p)));
+
+            attachments = new ObservableCollection<AttachmentViewModel>(
+                filePaths
+                    .Where(File.Exists)
+                    .Select(path => new AttachmentViewModel { File = new FileInfo(path) })
+            );
+
             AttachmentsPanel.ItemsSource = attachments;
         }
         private void OpenFile_Click(object sender, RoutedEventArgs e)
@@ -70,10 +78,25 @@ namespace CSharpResaleBusinessTracker
             {
                 try
                 {
+                    // Remove any references to the file to unlock it
+                    var container = AttachmentsPanel.ItemContainerGenerator.ContainerFromItem(
+                        attachments.FirstOrDefault(f => f.FullName == filePath)) as FrameworkElement;
+
+                    if (container != null)
+                    {
+                        var image = FindVisualChild<Image>(container);
+                        if (image != null)
+                            image.Source = null; // Release the file lock
+                    }
+
                     File.Delete(filePath);
 
                     // Remove from UI
-                    attachments.Remove(attachments.FirstOrDefault(f => f.FullName == filePath));
+                    var target = attachments.FirstOrDefault(f => string.Equals(f.FullName, filePath, StringComparison.OrdinalIgnoreCase));
+                    if (target != null)
+                    {
+                        attachments.Remove(target);
+                    }
 
                     // Update database
                     string updatedPaths = string.Join(";", attachments.Select(f => f.FullName));
@@ -87,6 +110,20 @@ namespace CSharpResaleBusinessTracker
                     MessageBox.Show($"Error deleting file: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
+        }
+        private static T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T correctlyTyped)
+                    return correctlyTyped;
+
+                var descendant = FindVisualChild<T>(child);
+                if (descendant != null)
+                    return descendant;
+            }
+            return null;
         }
     }
 }

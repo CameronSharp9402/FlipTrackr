@@ -8,33 +8,31 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace CSharpResaleBusinessTracker
+namespace FlipTrackr.Handlers
 {
     public class SeriesViewModel : INotifyPropertyChanged
     {
-        private bool isVisible = true;
-
         public string Title { get; set; }
         public LineSeries Series { get; set; }
 
         public bool IsVisible
         {
-            get => isVisible;
+            get => _isVisible;
             set
             {
-                if (isVisible != value)
+                if (_isVisible != value)
                 {
-                    isVisible = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(LegendColor));
+                    _isVisible = value;
+                    OnPropertyChanged(nameof(IsVisible));
+                    OnPropertyChanged(nameof(LegendColor)); // Notify when color changes
                 }
             }
         }
+        private bool _isVisible = true;
 
-        public Brush LegendColor => IsVisible ? Series.Stroke : Brushes.Gray;
+        public Brush LegendColor => IsVisible ? Brushes.Black : Brushes.Gray;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }
