@@ -64,6 +64,12 @@ FlipTrackr uses [Avalonia XPF](https://avaloniaui.net/xpf) to enable future supp
 
 ---
 
+## Source Code
+
+- All public source code is stored in the master branch within this repository
+
+---
+
 ## Where Your Data Lives
 
 Your data is stored locally at:  
