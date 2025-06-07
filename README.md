@@ -1,6 +1,6 @@
 # FlipTrackr
 
-**FlipTrackr** is a Windows desktop application designed to help resellers track inventory, manage expenses, and monitor profits with ease. Whether you're flipping part-time or running a full-time reselling operation, FlipTrackr provides a clean and powerful interface for staying on top of your business.
+**FlipTrackr** is a universal desktop application designed to help resellers track inventory, manage expenses, and monitor profits with ease. Whether you're flipping part-time or running a full-time reselling operation, FlipTrackr provides a clean and powerful interface for staying on top of your business.
 
 ---
 
